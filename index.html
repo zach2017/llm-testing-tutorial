@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testing a Small AI on a Grocery Store — Tutorial</title>
+<meta name="description" content="A step-by-step tutorial, with a simulated AI model, on how small language models answer questions and how they go wrong.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 fill=%27%23002d9c%27/%3E%3Ctext x=%278%27 y=%2712%27 font-size=%2710%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  if (window.tailwind) tailwind.config = { theme: { extend: { fontFamily: { sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'], mono: ['"IBM Plex Mono"', 'monospace'] },
+    colors: { ibm: { blue: '#0f62fe', navy: '#002d9c', ink: '#161616', gray: '#f4f4f4', line: '#e0e0e0' } } } } };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: #161616; background: #ffffff; }
+  .step-num { display:inline-flex; align-items:center; justify-content:center; width:2.2em; height:2.2em; background:#002d9c; color:#fff; font-weight:600; margin-right:.6em; flex:none; }
+  .card { border:1px solid #e0e0e0; border-top:4px solid #0f62fe; background:#fff; }
+  .info-btn { color:#0f62fe; text-decoration:underline dotted; cursor:pointer; }
+  .bubble { max-width: 100%; white-space: pre-wrap; }
+  .btn { background:#0f62fe; color:#fff; padding:.6em 1.1em; font-weight:500; }
+  .btn:hover { background:#0353e9; }
+  .btn-secondary { background:#fff; color:#0f62fe; border:1px solid #0f62fe; padding:.6em 1.1em; font-weight:500; }
+  .btn-secondary:hover { background:#edf5ff; }
+  details summary { cursor:pointer; }
+  @media print { .no-print { display:none !important; } }
+  @keyframes blink { 50% { opacity: .2; } }
+  .dots span { animation: blink 1.2s infinite; } .dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
+</style>
+</head>
+<body class="bg-white text-ibm-ink">
+
+<!-- ================= header ================= -->
+<header class="sticky top-0 z-40 bg-white border-b border-ibm-line no-print">
+  <div class="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-3">
+    <a href="index.html" class="font-semibold text-ibm-navy text-lg">Grocery-Store AI Test</a>
+    <nav class="flex gap-3 text-sm">
+      <a href="index.html" class="px-2 py-1 border-b-2 border-ibm-blue font-medium">Tutorial</a>
+      <a href="lab.html" class="px-2 py-1 hover:border-b-2 hover:border-ibm-blue">Live Lab (connect to Ollama)</a>
+    </nav>
+    <div class="ml-auto flex items-center gap-1 text-sm" aria-label="Text size">
+      <span class="hidden sm:inline mr-1">Text size</span>
+      <button onclick="fontSmaller()" class="btn-secondary !py-1 !px-2" aria-label="Smaller text">A&minus;</button>
+      <span class="w-12 text-center font-mono" data-font-value>16px</span>
+      <button onclick="fontBigger()" class="btn-secondary !py-1 !px-2" aria-label="Larger text">A+</button>
+      <button onclick="fontReset()" class="px-2 py-1 underline text-ibm-blue" aria-label="Reset text size">reset</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-8 space-y-14 leading-relaxed">
+
+<!-- ================= intro ================= -->
+<section id="start">
+  <p class="uppercase tracking-wide text-sm text-ibm-blue font-semibold">Step-by-step tutorial</p>
+  <h1 class="text-3xl sm:text-4xl font-semibold text-ibm-navy mt-1">How to test a small AI model — using a grocery store</h1>
+  <p class="mt-4 text-lg">Big AI chatbots run on huge computers far away. <b>Small</b> AI models can run on your own laptop, with no special graphics card. They are useful, but they make mistakes — and the interesting part is <em>how</em> they make mistakes. This tutorial teaches you to find out, using a made-up grocery store as the test.</p>
+  <div class="card p-4 mt-6">
+    <p class="font-semibold">You will learn</p>
+    <ol class="list-decimal ml-6 mt-2 space-y-1">
+      <li>What a language model actually does (in plain words).</li>
+      <li>The main ways small models go wrong, with real examples.</li>
+      <li>How to ask good test questions and score the answers fairly.</li>
+      <li>How to tell a real difference from luck (a little statistics).</li>
+      <li>How to set up a model on your own computer and run the test for real.</li>
+    </ol>
+    <p class="mt-3">The <b>simulated model</b> in step 4 works right here in your browser — nothing to install. When you are ready for a real model, go to the <a class="text-ibm-blue underline" href="lab.html">Live Lab</a>.</p>
+  </div>
+  <nav class="mt-6 text-sm no-print">
+    <p class="font-semibold mb-1">Jump to a step</p>
+    <ol class="flex flex-wrap gap-2">
+      <li><a href="#s1" class="btn-secondary !py-1 !px-2 inline-block">1 What is a model?</a></li>
+      <li><a href="#s2" class="btn-secondary !py-1 !px-2 inline-block">2 How they go wrong</a></li>
+      <li><a href="#s3" class="btn-secondary !py-1 !px-2 inline-block">3 Meet the store</a></li>
+      <li><a href="#s4" class="btn-secondary !py-1 !px-2 inline-block">4 Try the simulator</a></li>
+      <li><a href="#s5" class="btn-secondary !py-1 !px-2 inline-block">5 Scoring</a></li>
+      <li><a href="#s6" class="btn-secondary !py-1 !px-2 inline-block">6 Prompt styles</a></li>
+      <li><a href="#s7" class="btn-secondary !py-1 !px-2 inline-block">7 A little statistics</a></li>
+      <li><a href="#s8" class="btn-secondary !py-1 !px-2 inline-block">8 Set up your computer</a></li>
+      <li><a href="#s9" class="btn-secondary !py-1 !px-2 inline-block">9 Run it for real</a></li>
+      <li><a href="#glossary" class="btn-secondary !py-1 !px-2 inline-block">Glossary</a></li>
+    </ol>
+  </nav>
+</section>
+
+<!-- ================= step 1 ================= -->
+<section id="s1">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">1</span>What is a language model?</h2>
+  <p class="mt-3">A language model is a computer program that is very good at one game: <b>guess the next word</b>. It read an enormous amount of text and learned which words usually follow which. When you type a question, it keeps guessing the next word, over and over, until it has written an answer.</p>
+  <p class="mt-3">Think of it like autocomplete on a phone, but trained on so much text that its guesses often look like real understanding. Sometimes they <em>are</em> good enough. Sometimes the guess is a confident-sounding mistake.</p>
+  <div class="grid sm:grid-cols-3 gap-4 mt-5">
+    <div class="card p-4"><p class="font-semibold">Size = "parameters"</p><p class="text-sm mt-1">A model's size is counted in parameters (the numbers it learned). "1.5B" means 1.5 billion. Phone-sized models are 1–3B; the famous chatbots are hundreds of times bigger.</p></div>
+    <div class="card p-4"><p class="font-semibold">Tokens</p><p class="text-sm mt-1">Models read and write in <em>tokens</em> — pieces of words. "Grocery" might be 2 tokens. Speed is measured in tokens per second; a laptop CPU manages about 5–20 for a small model.</p></div>
+    <div class="card p-4"><p class="font-semibold">Thinking models</p><p class="text-sm mt-1">Some models (like deepseek-r1) write out their reasoning before the answer, inside <code class="font-mono">&lt;think&gt;</code> tags. We can read it to see <em>why</em> they got something wrong.</p></div>
+  </div>
+  <p class="mt-4"><a class="info-btn" data-info="llm">More about language models and where to read further &rarr;</a></p>
+</section>
+
+<!-- ================= step 2 ================= -->
+<section id="s2">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">2</span>How small models go wrong</h2>
+  <p class="mt-3">When we give a model a short text and ask questions about it, the mistakes fall into a few families. Each one has a name in this tutorial, and the test is designed to catch all of them.</p>
+  <div class="mt-5 overflow-x-auto">
+    <table class="w-full text-sm border border-ibm-line">
+      <thead class="bg-ibm-gray text-left"><tr><th class="p-2 border-b border-ibm-line">Name</th><th class="p-2 border-b border-ibm-line">What happens</th><th class="p-2 border-b border-ibm-line">Example from the store</th></tr></thead>
+      <tbody id="failure-table"></tbody>
+    </table>
+  </div>
+  <p class="mt-4"><a class="info-btn" data-info="hallucination">Why do models make things up? &rarr;</a></p>
+</section>
+
+<!-- ================= step 3 ================= -->
+<section id="s3">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">3</span>Meet the store</h2>
+  <p class="mt-3">To test fairly, we need a text whose facts <b>we control</b>. So we invented a store: <b>Maple Street Market</b>. It does not exist, so the model cannot know anything about it from its training. Every correct answer must come from the text below — and anything else is made up.</p>
+  <details class="card mt-4 p-4" open>
+    <summary class="font-semibold">The store text (about 400 words) — click to open or close</summary>
+    <pre id="document-box" class="whitespace-pre-wrap font-sans mt-3 text-[0.95em] leading-relaxed"></pre>
+  </details>
+  <div class="card p-4 mt-4">
+    <p class="font-semibold">Traps hidden in the text</p>
+    <ul class="list-disc ml-6 mt-2 space-y-1 text-[0.95em]">
+      <li>Three names that are easy to mix up: founder <b>Helen Park</b>, current owner <b>Daniel Park</b>, manager <b>Rosa Delgado</b>.</li>
+      <li>Two bakery times: bread arrives at <b>6:00 AM</b>, but the counter closes at <b>4:00 PM</b>.</li>
+      <li>The pharmacy opened in 2005 and <b>closed in 2023</b> — so "what are the pharmacy's hours?" is a trick question.</li>
+      <li>Delivery costs $4.00 but is free from <b>$50.00</b> — a rule with a threshold.</li>
+      <li>The store does <b>not</b> sell alcohol or tobacco — a "not" that models often miss.</li>
+      <li>There is an email address but <b>no phone number</b> — asking for one tests whether the model invents it.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= step 4: simulator ================= -->
+<section id="s4">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">4</span>Try it: the simulated model</h2>
+  <p class="mt-3">This is a <b>pretend</b> model that runs in your browser. It behaves the way small models typically behave: a "strong" one is right most of the time, a "weak" one often picks the wrong name or number, makes up missing facts, and goes along with false premises. Pick a question, press <b>Ask</b>, and watch it think, answer, and get scored. Then try the same question with a different prompt style or model strength.</p>
+  <div class="card p-4 mt-5 no-print">
+    <div class="grid md:grid-cols-2 gap-4">
+      <label class="block"><span class="font-semibold">Question</span>
+        <select id="sim-question" class="mt-1 w-full border border-gray-400 p-2 bg-white"></select></label>
+      <div class="grid grid-cols-2 gap-4">
+        <label class="block"><span class="font-semibold">Model strength</span>
+          <select id="sim-model" class="mt-1 w-full border border-gray-400 p-2 bg-white">
+            <option value="strong">strong (like a 3B model)</option><option value="medium" selected>medium (like a 1.5B)</option><option value="weak">weak (like a 1B)</option></select></label>
+        <label class="block"><span class="font-semibold">Prompt style <a class="info-btn text-sm" data-info="variants">?</a></span>
+          <select id="sim-variant" class="mt-1 w-full border border-gray-400 p-2 bg-white"></select></label>
+      </div>
+    </div>
+    <p id="sim-probe" class="mt-2 text-sm text-gray-700"></p>
+    <div class="flex flex-wrap gap-2 mt-3">
+      <button class="btn" onclick="simAsk()">Ask the simulated model</button>
+      <button class="btn-secondary" onclick="simRandom()">Surprise me</button>
+      <button class="btn-secondary" onclick="simShowPrompt()">Show the exact prompt</button>
+    </div>
+    <div id="sim-chat" class="mt-5 space-y-3"></div>
+    <div id="sim-tally" class="mt-4 text-sm text-gray-700"></div>
+  </div>
+  <p class="mt-4 text-sm">Why a simulator? Because a real model takes 20–90 seconds per answer on a laptop CPU. The simulator lets you learn the ideas in seconds; the <a class="text-ibm-blue underline" href="lab.html">Live Lab</a> then runs the real thing.</p>
+</section>
+
+<!-- ================= step 5: scoring ================= -->
+<section id="s5">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">5</span>How answers are scored</h2>
+  <p class="mt-3">A person could read each answer and say "right" or "wrong", but with hundreds of answers that is slow and people disagree. So we write a small <b>rule</b> for every question and let the computer apply it. The rule depends on the kind of answer:</p>
+  <div class="overflow-x-auto mt-4">
+    <table class="w-full text-sm border border-ibm-line">
+      <thead class="bg-ibm-gray text-left"><tr><th class="p-2 border-b">Rule type</th><th class="p-2 border-b">How it decides</th><th class="p-2 border-b">Example</th></tr></thead>
+      <tbody>
+        <tr><td class="p-2 border-b font-mono">numeric</td><td class="p-2 border-b">Is the expected number anywhere in the answer? (a cent of tolerance; "four" counts; clock times like 9:00 are ignored)</td><td class="p-2 border-b">"$3.60" or "3.6 dollars" both pass for 3.60</td></tr>
+        <tr><td class="p-2 border-b font-mono">contains</td><td class="p-2 border-b">Is the expected phrase (or an accepted alias) in the answer?</td><td class="p-2 border-b">"Helen Park"; "9 am" accepted for "9:00 AM"</td></tr>
+        <tr><td class="p-2 border-b font-mono">yes_no</td><td class="p-2 border-b">Which comes first in the answer, a yes-word or a no-word?</td><td class="p-2 border-b">"No, it closes at 6" &rarr; no</td></tr>
+        <tr><td class="p-2 border-b font-mono">choice</td><td class="p-2 border-b">Which option is mentioned first?</td><td class="p-2 border-b">"Regular apples cost more" &rarr; apple</td></tr>
+        <tr><td class="p-2 border-b font-mono">set</td><td class="p-2 border-b">How many of the expected items are present, with penalties for extra ones (F1 score)</td><td class="p-2 border-b">holidays: Thanksgiving + Christmas; adding New Year's costs points</td></tr>
+        <tr><td class="p-2 border-b font-mono">exact</td><td class="p-2 border-b">One token only, and it must be right — tests instruction following</td><td class="p-2 border-b">"2" passes; "There are 2." is a format violation</td></tr>
+        <tr><td class="p-2 border-b font-mono">refusal</td><td class="p-2 border-b">For unanswerable questions: did the model say the text does not have it?</td><td class="p-2 border-b">"Not stated in the text" passes; a phone number fails</td></tr>
+        <tr><td class="p-2 border-b font-mono">premise_correction</td><td class="p-2 border-b">For false-premise questions: did it state the true fact or push back?</td><td class="p-2 border-b">"It closes at 6 PM, not noon" passes</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-4">Only the <b>final answer</b> is scored. Thinking inside <code class="font-mono">&lt;think&gt;</code> tags is removed first, and when the prompt asks for a <code class="font-mono">FINAL ANSWER:</code> line, only that line counts. Every wrong answer also gets a label from step 2, so we can count <em>how</em> a model goes wrong, not only how often.</p>
+  <div class="card p-4 mt-4 no-print">
+    <p class="font-semibold">Try the scorer yourself</p>
+    <p class="text-sm mt-1">Pick a question and type any answer. The same scoring code runs in the Live Lab and in the Python tools.</p>
+    <div class="grid md:grid-cols-2 gap-3 mt-2">
+      <select id="score-question" class="border border-gray-400 p-2 bg-white"></select>
+      <input id="score-answer" class="border border-gray-400 p-2" placeholder="Type an answer, e.g. The store opens at 9 am">
+    </div>
+    <button class="btn mt-3" onclick="scoreTry()">Score it</button>
+    <div id="score-out" class="mt-3 text-sm"></div>
+  </div>
+  <p class="mt-4"><a class="info-btn" data-info="scoring">Limits of rule-based scoring, and the LLM-judge option &rarr;</a></p>
+</section>
+
+<!-- ================= step 6: prompt styles ================= -->
+<section id="s6">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">6</span>Prompt styles: same question, different wrapping</h2>
+  <p class="mt-3">A <b>prompt</b> is everything we send to the model: the store text, the question, and any instructions around them. Small models are very sensitive to this wrapping. So the test asks every question in several styles and compares. Open each one to see the exact template (<code class="font-mono">{context}</code> is replaced by the store text, <code class="font-mono">{question}</code> by the question).</p>
+  <div id="variant-list" class="mt-4 space-y-2"></div>
+</section>
+
+<!-- ================= step 7: statistics ================= -->
+<section id="s7">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">7</span>A little statistics: is the difference real?</h2>
+  <p class="mt-3">Suppose model A gets 30 of 42 questions right (71%) and model B gets 27 (64%). Is A better? Maybe — or maybe B was unlucky on three coin-flip questions. With a small number of questions, accuracy jumps around a lot. A <b>confidence interval</b> is a range that says "the true accuracy is probably somewhere in here." If two models' ranges overlap a lot, you have not shown a difference yet.</p>
+  <div class="card p-4 mt-4 no-print">
+    <p class="font-semibold">Confidence-interval calculator (95% Wilson interval)</p>
+    <div class="flex flex-wrap items-end gap-3 mt-2">
+      <label>Correct <input id="ci-k" type="number" value="30" min="0" class="border border-gray-400 p-2 w-24 ml-1"></label>
+      <label>out of <input id="ci-n" type="number" value="42" min="1" class="border border-gray-400 p-2 w-24 ml-1"></label>
+      <button class="btn" onclick="ciCalc()">Calculate</button>
+    </div>
+    <p id="ci-out" class="mt-3"></p>
+  </div>
+  <p class="mt-4">Two ways to shrink the range: ask <b>more questions</b> (all 8 prompt styles gives 336 answers per model) and <b>repeat</b> the run. The report also uses a paired test that compares the two models question by question, which is fairer than comparing totals. <a class="info-btn" data-info="stats">More on the statistics &rarr;</a></p>
+</section>
+
+<!-- ================= step 8: setup ================= -->
+<section id="s8">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">8</span>Set up your computer (CPU only, no graphics card needed)</h2>
+  <p class="mt-3">You need one program: <b>Ollama</b>. It downloads models and runs them on your computer, and it opens a small door (an API on port 11434) that web pages and scripts can talk to. Python is only needed for the command-line tools; the Live Lab page works with just Ollama.</p>
+  <div class="mt-4 flex gap-2 no-print" role="tablist">
+    <button class="btn-secondary os-tab" data-os="win" onclick="showOs('win')">Windows</button>
+    <button class="btn-secondary os-tab" data-os="mac" onclick="showOs('mac')">macOS</button>
+    <button class="btn-secondary os-tab" data-os="linux" onclick="showOs('linux')">Linux</button>
+  </div>
+  <div class="card p-4 mt-3 os-panel" data-os="win">
+    <ol class="list-decimal ml-6 space-y-2">
+      <li>Download Ollama from <a class="text-ibm-blue underline" target="_blank" rel="noopener" href="https://ollama.com/download/windows">ollama.com/download/windows</a> and run the installer. Ollama then runs in the background (look for its icon by the clock).</li>
+      <li>Open <b>Command Prompt</b> (press the Windows key, type <code class="font-mono">cmd</code>, press Enter).</li>
+      <li>Type <code class="font-mono bg-ibm-gray px-1">ollama pull deepseek-r1:1.5b</code> and press Enter. This downloads about 1.1 GB once.</li>
+      <li>Check it works: <code class="font-mono bg-ibm-gray px-1">ollama run deepseek-r1:1.5b "Say hello"</code>. Type <code class="font-mono">/bye</code> to leave the chat.</li>
+      <li>Optional, for the command-line tools: install Python from <a class="text-ibm-blue underline" target="_blank" rel="noopener" href="https://www.python.org/downloads/">python.org</a> and tick <b>"Add python.exe to PATH"</b>. Then double-click <code class="font-mono">check_tools.bat</code> in the kit.</li>
+    </ol>
+  </div>
+  <div class="card p-4 mt-3 os-panel hidden" data-os="mac">
+    <ol class="list-decimal ml-6 space-y-2">
+      <li>Download Ollama from <a class="text-ibm-blue underline" target="_blank" rel="noopener" href="https://ollama.com/download/mac">ollama.com/download/mac</a>, open it, and drag it to Applications. Start it once; it lives in the menu bar.</li>
+      <li>Open <b>Terminal</b> (Command+Space, type Terminal).</li>
+      <li>Type <code class="font-mono bg-ibm-gray px-1">ollama pull deepseek-r1:1.5b</code> and press Return (about 1.1 GB).</li>
+      <li>Check it works: <code class="font-mono bg-ibm-gray px-1">ollama run deepseek-r1:1.5b "Say hello"</code>. Type <code class="font-mono">/bye</code> to leave.</li>
+      <li>Optional: Python 3 is often already installed (<code class="font-mono">python3 --version</code>); otherwise <code class="font-mono">brew install python</code>. Then run <code class="font-mono">bash check_tools.sh</code> in the kit.</li>
+    </ol>
+  </div>
+  <div class="card p-4 mt-3 os-panel hidden" data-os="linux">
+    <ol class="list-decimal ml-6 space-y-2">
+      <li>Install Ollama: <code class="font-mono bg-ibm-gray px-1">curl -fsSL https://ollama.com/install.sh | sh</code>. The installer usually sets up a background service; if not, run <code class="font-mono">ollama serve</code> in a terminal and leave it open.</li>
+      <li>Download the model: <code class="font-mono bg-ibm-gray px-1">ollama pull deepseek-r1:1.5b</code>.</li>
+      <li>Check it works: <code class="font-mono bg-ibm-gray px-1">ollama run deepseek-r1:1.5b "Say hello"</code>.</li>
+      <li>Optional: <code class="font-mono">python3 --version</code> (3.9 or newer), then <code class="font-mono">bash check_tools.sh</code> in the kit.</li>
+    </ol>
+  </div>
+  <div class="grid sm:grid-cols-2 gap-4 mt-4">
+    <div class="card p-4"><p class="font-semibold">What to expect on a CPU</p><p class="text-sm mt-1">deepseek-r1:1.5b thinks before it answers, so one question takes 20–90 seconds and the answer needs room (we allow 1,500 tokens). Non-thinking models like <code class="font-mono">gemma3:1b</code> or <code class="font-mono">llama3.2:1b</code> answer in a few seconds. 4 GB of free memory is plenty.</p></div>
+    <div class="card p-4"><p class="font-semibold">Letting a web page talk to Ollama</p><p class="text-sm mt-1">Browsers only let a page call a server that allows it (this is called CORS). Ollama allows pages from <code class="font-mono">localhost</code> and local files by default. If the Live Lab says "blocked", set the environment variable <code class="font-mono">OLLAMA_ORIGINS=*</code> and restart Ollama. <a class="info-btn" data-info="cors">How to set it &rarr;</a></p></div>
+  </div>
+</section>
+
+<!-- ================= step 9: run for real ================= -->
+<section id="s9">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">9</span>Run it for real</h2>
+  <p class="mt-3">You have three ways to run the real test, from simplest to most complete:</p>
+  <div class="grid md:grid-cols-3 gap-4 mt-4">
+    <div class="card p-4">
+      <p class="font-semibold">A. Live Lab in the browser</p>
+      <p class="text-sm mt-1">Open <a class="text-ibm-blue underline" href="lab.html">lab.html</a>. It checks what is missing, saves your settings in the browser (localStorage), lets you pick questions and prompt styles, shows each answer with its thinking and score, and exports a Markdown report or prints to PDF.</p>
+      <a class="btn inline-block mt-3" href="lab.html">Open the Live Lab</a>
+    </div>
+    <div class="card p-4">
+      <p class="font-semibold">B. Python command line</p>
+      <p class="text-sm mt-1">Runs the full matrix (42 questions × 8 styles), repeats, paraphrases, and writes the statistical report with charts.</p>
+      <pre class="font-mono text-xs bg-ibm-gray p-2 mt-2 overflow-x-auto">python run_eval.py --models deepseek-r1:1.5b \
+  --variants baseline strict_grounded \
+  --num-predict 1500 --out results/first_run</pre>
+      <p class="text-sm mt-2">Guided version: <code class="font-mono">setup_wizard.bat</code> / <code class="font-mono">bash setup_wizard.sh</code>.</p>
+    </div>
+    <div class="card p-4">
+      <p class="font-semibold">C. Go API server (optional)</p>
+      <p class="text-sm mt-1">A tiny server that serves these pages, forwards requests to Ollama (no CORS worries), <b>saves every run</b> to disk, and exports reports as Markdown, JSON or PDF.</p>
+      <pre class="font-mono text-xs bg-ibm-gray p-2 mt-2 overflow-x-auto">cd server
+go run .
+# then open http://localhost:8080</pre>
+      <p class="text-sm mt-2"><a class="info-btn" data-info="goserver">What the server does and how to install Go &rarr;</a></p>
+    </div>
+  </div>
+  <div class="card p-4 mt-5">
+    <p class="font-semibold">A good first experiment (about an hour on a laptop)</p>
+    <ol class="list-decimal ml-6 mt-2 space-y-1 text-[0.95em]">
+      <li>In the Live Lab, run all 42 questions with the <b>baseline</b> style. Note the accuracy and the failure-mode counts.</li>
+      <li>Run them again with <b>strict_grounded</b>. Prediction: fewer hallucinations, but more over-refusals. Were you right?</li>
+      <li>Find one <b>premise_accepted</b> failure and re-ask it with the <b>cot</b> style. Read the thinking: did the model notice the false premise?</li>
+      <li>Pull a second model (<code class="font-mono">ollama pull gemma3:1b</code>) and repeat step 1. Use the confidence intervals from step 7 before declaring a winner.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= glossary ================= -->
+<section id="glossary">
+  <h2 class="text-2xl font-semibold text-ibm-navy">Glossary</h2>
+  <dl class="mt-3 grid sm:grid-cols-2 gap-x-8 gap-y-3 text-[0.95em]">
+    <div><dt class="font-semibold">API</dt><dd>A door through which programs talk to each other. Ollama's API listens at <code class="font-mono">http://localhost:11434</code>.</dd></div>
+    <div><dt class="font-semibold">Accuracy</dt><dd>Share of questions answered correctly.</dd></div>
+    <div><dt class="font-semibold">Baseline</dt><dd>The plain prompt style every other style is compared with.</dd></div>
+    <div><dt class="font-semibold">Confidence interval</dt><dd>A range that probably contains the true value; narrower with more data.</dd></div>
+    <div><dt class="font-semibold">Context</dt><dd>The text given to the model to answer from — here, the store description.</dd></div>
+    <div><dt class="font-semibold">CORS</dt><dd>A browser safety rule about which web pages may call which servers.</dd></div>
+    <div><dt class="font-semibold">Hallucination</dt><dd>A confident answer that was made up rather than found in the text.</dd></div>
+    <div><dt class="font-semibold">localStorage</dt><dd>A small storage area inside your browser where a page can remember settings and results. Nothing leaves your computer.</dd></div>
+    <div><dt class="font-semibold">Markdown</dt><dd>A simple text format for documents (headings with #, tables with |). Reports are written in it.</dd></div>
+    <div><dt class="font-semibold">Ollama</dt><dd>Free software that downloads and runs models on your own computer.</dd></div>
+    <div><dt class="font-semibold">Parameter</dt><dd>One of the billions of numbers a model learned. More parameters = bigger, usually smarter, slower.</dd></div>
+    <div><dt class="font-semibold">Prompt</dt><dd>Everything sent to the model: instructions, context and question.</dd></div>
+    <div><dt class="font-semibold">Temperature</dt><dd>How random the model's word choices are. 0 = same answer every time; 0.7 = varied.</dd></div>
+    <div><dt class="font-semibold">Token</dt><dd>A piece of a word; the unit models read and write in.</dd></div>
+  </dl>
+</section>
+
+</main>
+
+<footer class="border-t border-ibm-line mt-10">
+  <div class="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-700">
+    <p class="font-semibold text-ibm-ink">References and official documentation</p>
+    <ul id="footer-links" class="list-disc ml-5 mt-2 space-y-1"></ul>
+    <p class="mt-4">Part of the grocery-llm-eval kit. Maple Street Market is fictional. Page styling uses Tailwind CSS and the IBM Plex typeface. &copy; <span id="year"></span></p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="scoring.js"></script>
+<script src="common.js"></script>
+<script>
+(function () {
+  const D = window.GROCERY_DATA, S = window.GroceryScoring;
+  const byId = (id) => document.getElementById(id);
+
+  // ---------- popups
+  window.INFO = {
+    llm: { title: "Language models in a bit more depth", links: ["llm", "deepseek", "gemma", "llama"], html: `
+      <p>Models are trained by showing them text with a word hidden and rewarding them for guessing it. Do that trillions of times and the model picks up grammar, facts, and patterns of reasoning — but it never "looks things up"; it only predicts.</p>
+      <p class="mt-2">That is why giving the model the store text <em>inside the prompt</em> matters: we want it to copy facts from the text, not recall them. Researchers call this "reading comprehension" or "grounded question answering".</p>
+      <p class="mt-2"><b>Small models</b> (1–3 billion parameters) fit in a few gigabytes of memory and run on a CPU. They are the ones you can study at home, and their mistakes are bigger and easier to see — which makes them good teaching subjects.</p>` },
+    hallucination: { title: "Why models make things up", links: ["hallucination"], html: `
+      <p>A model's job is to produce likely-looking text. If you ask for a phone number, "a phone number" is the likely-looking shape of the answer — so the model may produce one even though the text has none. Nothing inside it checks whether the number is true.</p>
+      <p class="mt-2">Instructions help ("if the text does not say, reply <em>Not stated</em>"), but they have a cost: the model may start refusing questions it <em>could</em> answer. The test measures both sides of this trade-off: <b>hallucination</b> and <b>over-refusal</b>.</p>
+      <p class="mt-2">A related failure is <b>premise acceptance</b>: ask "why does the store close at noon on Sunday?" and a model eager to be helpful explains a reason, instead of saying the store closes at 6 PM.</p>` },
+    variants: { title: "Prompt styles in the simulator", links: [], html: `<p>Each style wraps the same question differently. <b>baseline</b> is plain; <b>strict_grounded</b> tells the model to say "Not stated" if the text lacks the answer; <b>cot</b> asks it to reason step by step and end with FINAL ANSWER; <b>few_shot</b> shows two examples first; <b>persona</b> makes it a cheerful shop assistant; <b>question_first</b> puts the question before the text; <b>distractor</b> adds a paragraph about another store; <b>no_context</b> removes the text entirely (a control). Step 6 shows every template in full.</p>` },
+    scoring: { title: "Limits of rule-based scoring", links: ["markdown"], html: `
+      <p>Rules are fast, free and repeatable, but they are not perfect. Known weak spots:</p>
+      <ul class="list-disc ml-5 mt-2 space-y-1">
+        <li>Comparisons: "bananas are cheaper than apples" mentions bananas first, and the rule reads the first option mentioned.</li>
+        <li>An answer that lists several numbers, one of them right, is scored correct.</li>
+        <li>Refusals are detected by phrases like "not stated" or "does not mention"; unusual wording can slip past.</li>
+      </ul>
+      <p class="mt-2">Two safeguards: a <b>self-test</b> checks that every reference answer scores correct and every realistic wrong answer scores incorrect; and the Python runner can ask a bigger model to act as a <b>judge</b> (<code class="font-mono">--judge-model</code>) so you can compare the two scorers. Always keep the raw answers so a human can re-check.</p>` },
+    stats: { title: "The statistics used in the report", links: ["wilson"], html: `
+      <p><b>Wilson interval</b>: the 95% range for an accuracy measured on n questions. With n = 42 the range is about ±14 points; with n = 336 it shrinks to about ±5.</p>
+      <p class="mt-2"><b>Paired comparison</b>: instead of comparing totals, look at each question and ask "did A get it right while B got it wrong?" and vice versa. If those two counts are similar, the models are not really different. The report gives a bootstrap confidence interval for the difference and an exact sign-test p-value.</p>
+      <p class="mt-2"><b>Rule of thumb</b>: if the interval for the difference includes 0, you have not shown a difference. Collect more data (more prompt styles, repeats) rather than arguing over a few points.</p>` },
+    cors: { title: "Allowing the Live Lab to reach Ollama (CORS)", links: ["ollamaFaq", "cors"], html: `
+      <p>By default Ollama accepts requests from pages at <code class="font-mono">localhost</code>, <code class="font-mono">127.0.0.1</code> and from local files, so opening the lab directly or through the Go server normally just works.</p>
+      <p class="mt-2">If the prerequisite check reports "blocked by the browser (CORS)", allow all origins and restart Ollama:</p>
+      <ul class="list-disc ml-5 mt-2 space-y-1">
+        <li><b>Windows</b>: Settings &rarr; System &rarr; About &rarr; Advanced system settings &rarr; Environment Variables &rarr; New: name <code class="font-mono">OLLAMA_ORIGINS</code>, value <code class="font-mono">*</code>. Quit Ollama from the tray icon and start it again.</li>
+        <li><b>macOS</b>: in Terminal run <code class="font-mono">launchctl setenv OLLAMA_ORIGINS "*"</code>, then quit and restart Ollama from the menu bar.</li>
+        <li><b>Linux</b>: <code class="font-mono">OLLAMA_ORIGINS=* ollama serve</code>, or add <code class="font-mono">Environment="OLLAMA_ORIGINS=*"</code> to the systemd service (<code class="font-mono">systemctl edit ollama</code>) and restart it.</li>
+      </ul>
+      <p class="mt-2">Alternative that needs no settings: run the Go server and open <code class="font-mono">http://localhost:8080</code>; the server forwards requests to Ollama from the same origin.</p>` },
+    goserver: { title: "The optional Go API server", links: ["go", "ollamaApi"], html: `
+      <p>The <code class="font-mono">server/</code> folder contains a small program written in Go. It needs no extra libraries. Install Go from go.dev, then in a terminal run <code class="font-mono">cd server</code> and <code class="font-mono">go run .</code></p>
+      <p class="mt-2">It serves the tutorial and lab pages at <code class="font-mono">http://localhost:8080</code>, forwards <code class="font-mono">/api/ollama/...</code> to Ollama, saves each run you make in the lab to <code class="font-mono">server/data/runs/</code>, lists past runs, and exports any run as <code class="font-mono">report.md</code>, <code class="font-mono">run.json</code>, a printable HTML page, or a PDF.</p>
+      <p class="mt-2">The lab works without it (results stay in your browser's localStorage); the server adds permanent storage and sharing.</p>` },
+  };
+
+  // ---------- footer links
+  byId("footer-links").innerHTML = Object.values(window.DOC_LINKS).map(([l, u]) => `<li><a class="text-ibm-blue underline" target="_blank" rel="noopener" href="${u}">${l}</a></li>`).join("");
+
+  // ---------- failure table (step 2)
+  const failureExamples = {
+    wrong_entity: ["Picks the wrong name or option", "Asked who founded the store, answers 'Daniel Park' (the current owner)."],
+    wrong_value: ["Gives a number, but the wrong one", "Says blueberry muffins cost $1.50 (that is the soup price)."],
+    hallucination: ["Makes up a fact that is not in the text", "Invents a phone number — the text only gives an email."],
+    over_refusal: ["Says 'not stated' when the fact IS there", "Asked how many employees, replies 'the text does not say' (it says 14)."],
+    premise_accepted: ["Goes along with a false claim in the question", "'Why does it close at noon on Sundays?' — explains a reason instead of saying it closes at 6 PM."],
+    format_violation: ["Right answer, but ignored the format rule", "Asked for only a number, writes 'There are 2 kiosks.'"],
+    partial: ["Gets a list partly right", "Holidays: Thanksgiving, Christmas... and New Year's Day (added)."],
+    no_answer: ["Produces nothing scoreable", "Rambles without ever giving a number."],
+  };
+  byId("failure-table").innerHTML = Object.entries(failureExamples).map(([k, [what, ex]]) =>
+    `<tr><td class="p-2 border-b border-ibm-line font-mono whitespace-nowrap">${k}</td><td class="p-2 border-b border-ibm-line">${what}</td><td class="p-2 border-b border-ibm-line">${ex}</td></tr>`).join("");
+
+  // ---------- document (step 3)
+  byId("document-box").textContent = D.document;
+
+  // ---------- question selects
+  const qOptions = D.questions.map((q) => `<option value="${q.id}">${q.id} [${q.category}] ${escapeHtml(q.question)}</option>`).join("");
+  byId("sim-question").innerHTML = qOptions; byId("score-question").innerHTML = qOptions;
+  byId("sim-variant").innerHTML = Object.keys(D.prompts.variants).map((v) => `<option value="${v}">${v}</option>`).join("");
+  const qById = Object.fromEntries(D.questions.map((q) => [q.id, q]));
+  function updateProbe() { const q = qById[byId("sim-question").value]; byId("sim-probe").textContent = "What this question probes: " + q.probe; }
+  byId("sim-question").addEventListener("change", updateProbe); updateProbe();
+
+  // ---------- simulator
+  const PROFILE = { strong: { acc: 0.88, refuse: 0.85, premise: 0.75, over: 0.03, think: "careful" }, medium: { acc: 0.68, refuse: 0.5, premise: 0.4, over: 0.08, think: "ok" }, weak: { acc: 0.45, refuse: 0.2, premise: 0.15, over: 0.15, think: "sloppy" } };
+  const VMOD = { baseline: {}, strict_grounded: { acc: -0.02, refuse: 0.3, over: 0.15 }, cot: { acc: 0.06, premise: 0.15, refuse: 0.05 }, few_shot: { acc: 0.04, refuse: 0.2 }, persona: { acc: -0.03, refuse: -0.25, premise: -0.2 }, question_first: { acc: -0.04 }, distractor: { acc: -0.15, refuse: -0.1, premise: -0.1 }, no_context: { acc: -0.8, refuse: 0.1, over: 0.55, premise: -0.3 } };
+  const CMOD = { arithmetic: -0.12, negation: -0.05, comparison: -0.05, instruction_following: 0.05, counting: -0.03 };
+  const REFUSALS = ["The text does not say.", "Not stated in the text.", "This information is not provided in the passage."];
+  const seq = {}; let tally = { n: 0, ok: 0 };
+  function rng(seedStr) { let x = hashInt(seedStr) || 1; return () => { x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; }; }
+  function buildPrompt(variantName, q) {
+    const v = D.prompts.variants[variantName];
+    const ctx = v.context_mode === "none" ? "" : D.document + (v.context_mode === "document_plus_distractor" ? "\n\n" + D.prompts.distractor_text : "");
+    const few = D.prompts.few_shot_examples.map((e) => `QUESTION: ${e.question}\nANSWER: ${e.answer}`).join("\n\n");
+    const r = (t) => t && t.replace("{context}", ctx).replace("{question}", q.question).replace("{few_shot}", few);
+    return { system: r(v.system), user: r(v.user) };
+  }
+  window.simPrompt = buildPrompt;
+  function simulate(q, strength, variant, attempt) {
+    const p = Object.assign({}, PROFILE[strength]); for (const [k, v] of Object.entries(VMOD[variant] || {})) p[k] = (p[k] || 0) + v;
+    p.acc += (CMOD[q.category] || 0) - 0.06 * ((q.difficulty || 1) - 1);
+    const r = rng(`${q.id}|${strength}|${variant}|${attempt}`);
+    const c = (x) => Math.max(0, Math.min(1, x));
+    let answer, correctIntent, thinking;
+    const ev = { factual: "I need to find the sentence that mentions this.", temporal: "Let me look at the opening hours sentence and compare times.", arithmetic: "I will find the prices and do the math.", counting: "Let me count what the text lists.", comparison: "I will find both numbers and compare them.", negation: "Watch out for the word 'not' in the text.", unanswerable: "Let me search the text for this... I do not see it.", false_premise: "Does the text agree with what the question assumes?", instruction_following: "The question also tells me how to format the answer." }[q.category];
+    if (q.category === "unanswerable") { correctIntent = r() < c(p.refuse); answer = correctIntent ? REFUSALS[Math.floor(r() * 3)] : q.plausible_wrong;
+      thinking = ev + (correctIntent ? " The text does not contain it, so I should say so." : " It is probably something like... I will give my best guess."); }
+    else if (q.category === "false_premise") { correctIntent = r() < c(p.premise); answer = correctIntent ? q.expected_response : q.plausible_wrong;
+      thinking = ev + (correctIntent ? " Actually, the text says something different, so the question is wrong." : " The question says so, so I will explain it."); }
+    else if (r() < c(p.over)) { correctIntent = false; answer = REFUSALS[Math.floor(r() * 3)]; thinking = ev + " Hmm, I cannot find it... I will say it is not stated."; }
+    else { correctIntent = r() < c(p.acc); answer = correctIntent ? q.expected_response : q.plausible_wrong;
+      thinking = ev + (correctIntent ? " Found it. Now I will write the answer." : (p.think === "sloppy" ? " There is a similar sentence nearby; that must be it." : " I think I remember the value... writing it down.")); }
+    if (variant === "no_context") thinking = "There is no text to read, only the question. " + (answer === q.plausible_wrong ? "I will guess something that sounds right." : "I had better say I do not know.");
+    if (variant === "cot") answer = `Relevant sentence: "${(q.category === "unanswerable") ? "(none found)" : "...see the text..."}"\nStep 2: work it out.\nFINAL ANSWER: ${answer}`;
+    if (variant === "persona" && r() < 0.6) answer = ["Sure thing! ", "Great question! ", "Happy to help! "][Math.floor(r() * 3)] + answer + " Anything else I can help with?";
+    return { thinking, answer };
+  }
+  function bubble(role, html, extra) {
+    const left = role !== "user";
+    return `<div class="flex ${left ? "" : "justify-end"}"><div class="bubble p-3 border ${left ? "border-ibm-line bg-ibm-gray" : "border-ibm-blue bg-blue-50"} max-w-[90%] ${extra || ""}">${html}</div></div>`;
+  }
+  window.simAsk = async function () {
+    const q = qById[byId("sim-question").value], strength = byId("sim-model").value, variant = byId("sim-variant").value;
+    const key = `${q.id}|${strength}|${variant}`; seq[key] = (seq[key] || 0) + 1;
+    const chat = byId("sim-chat");
+    chat.insertAdjacentHTML("beforeend", bubble("user", `<b>You (${variant}):</b> ${escapeHtml(q.question)}`));
+    const id = "t" + Date.now();
+    chat.insertAdjacentHTML("beforeend", `<div id="${id}">${bubble("model", `<span class="dots">thinking<span>.</span><span>.</span><span>.</span></span>`)}</div>`);
+    chat.lastElementChild.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    await new Promise((res) => setTimeout(res, 900));
+    const sim = simulate(q, strength, variant, seq[key]);
+    const sc = S.scoreResponse(q, sim.answer);
+    const verdict = sc.correct ? `<span class="text-green-800 font-semibold">CORRECT</span>` : `<span class="text-red-800 font-semibold">INCORRECT &rarr; ${sc.failure_mode}</span>`;
+    const why = sc.correct ? "" : ` <span class="text-gray-700">(${escapeHtml(S.FAILURE_MODE_HELP[sc.failure_mode] || "")})</span>`;
+    byId(id).innerHTML = bubble("model", `<details class="text-sm text-gray-700"><summary>Model's thinking (click)</summary><div class="mt-1 italic">${escapeHtml(sim.thinking)}</div></details><div class="mt-2"><b>Simulated model (${strength}):</b> ${escapeHtml(sim.answer)}</div>`) +
+      bubble("score", `<b>Scorer:</b> ${verdict}${why}<br><span class="text-sm">Expected: ${escapeHtml(q.expected_response)} &middot; rule: <code class="font-mono">${q.scoring.type}</code> &middot; ${escapeHtml(sc.scoring_detail)}</span>`, "border-dashed bg-white");
+    tally.n++; if (sc.correct) tally.ok++;
+    byId("sim-tally").innerHTML = `So far in this session: ${tally.ok} correct out of ${tally.n} (${Math.round(100 * tally.ok / tally.n)}%). Try the same question with another strength or style — the simulated model is seeded, so the same choice gives the same answer the first time and may vary on repeats, like a real model at temperature 0.7.`;
+    byId(id).scrollIntoView({ behavior: "smooth", block: "nearest" });
+  };
+  window.simRandom = function () {
+    const qs = D.questions; byId("sim-question").value = qs[Math.floor(Math.random() * qs.length)].id; updateProbe();
+    const vs = Object.keys(D.prompts.variants); byId("sim-variant").value = vs[Math.floor(Math.random() * vs.length)];
+    simAsk();
+  };
+  window.simShowPrompt = function () {
+    const q = qById[byId("sim-question").value], variant = byId("sim-variant").value, p = buildPrompt(variant, q);
+    showInfo(`Exact prompt for "${variant}"`, (p.system ? `<p class="font-semibold">System message</p><pre class="font-mono text-xs bg-ibm-gray p-2 whitespace-pre-wrap">${escapeHtml(p.system)}</pre>` : "") + `<p class="font-semibold mt-3">User message</p><pre class="font-mono text-xs bg-ibm-gray p-2 whitespace-pre-wrap">${escapeHtml(p.user)}</pre>`, ["ollamaApi"]);
+  };
+
+  // ---------- scorer playground (step 5)
+  window.scoreTry = function () {
+    const q = qById[byId("score-question").value], a = byId("score-answer").value;
+    const sc = S.scoreResponse(q, a);
+    byId("score-out").innerHTML = `<p>Expected: <b>${escapeHtml(q.expected_response)}</b> (rule <code class="font-mono">${q.scoring.type}</code>)</p><p class="mt-1">Result: ${sc.correct ? '<span class="text-green-800 font-semibold">CORRECT</span>' : `<span class="text-red-800 font-semibold">INCORRECT &rarr; ${sc.failure_mode}</span>`} &mdash; ${escapeHtml(sc.scoring_detail)}</p>`;
+  };
+
+  // ---------- variants (step 6)
+  const vdesc = { baseline: "The reference. Text, then question, nothing else.", strict_grounded: "Tells the model to use only the text and to say 'Not stated in the text.' when the answer is missing. Usually fewer hallucinations, but more over-refusals.", cot: "'Chain of thought': quote the evidence, reason step by step, finish with FINAL ANSWER. Often helps arithmetic; also lets us read the process.", few_shot: "Shows two worked examples first, one factual and one 'Not stated'. Demonstrations often beat instructions for small models.", persona: "A cheerful shop assistant with the text in the system message. Tests whether eagerness to please causes made-up answers.", question_first: "Identical to baseline but the question comes before the text. Tests sensitivity to order.", distractor: "A paragraph about a different store with conflicting numbers is added. Tests whether the model mixes the stores up.", no_context: "Control: the question with no text at all. A correct answer here is a guess; the ideal behaviour is to abstain." };
+  byId("variant-list").innerHTML = Object.entries(D.prompts.variants).map(([name, v]) => `
+    <details class="card p-3"><summary class="font-semibold">${name} <span class="font-normal text-sm text-gray-700">— ${escapeHtml(vdesc[name] || v.description)}</span></summary>
+      ${v.system ? `<p class="text-sm font-semibold mt-3">System message</p><pre class="font-mono text-xs bg-ibm-gray p-2 whitespace-pre-wrap">${escapeHtml(v.system)}</pre>` : ""}
+      <p class="text-sm font-semibold mt-3">User message</p><pre class="font-mono text-xs bg-ibm-gray p-2 whitespace-pre-wrap">${escapeHtml(v.user)}</pre>
+      <p class="text-xs text-gray-700 mt-2">context mode: ${v.context_mode}</p></details>`).join("");
+
+  // ---------- CI calculator (step 7)
+  window.ciCalc = function () {
+    const k = +byId("ci-k").value, n = +byId("ci-n").value; if (!(n > 0) || k < 0 || k > n) { byId("ci-out").textContent = "Enter a correct count between 0 and the total."; return; }
+    const z = 1.96, p = k / n, d = 1 + z * z / n, c = (p + z * z / (2 * n)) / d, h = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d;
+    byId("ci-out").innerHTML = `Accuracy <b>${(100 * p).toFixed(1)}%</b>. The true accuracy is probably between <b>${(100 * Math.max(0, c - h)).toFixed(1)}%</b> and <b>${(100 * Math.min(1, c + h)).toFixed(1)}%</b> (95% confidence). That range is ${(200 * h).toFixed(0)} points wide — ${n < 100 ? "wide, because n is small" : "reasonably narrow"}.`;
+  };
+  ciCalc();
+
+  // ---------- OS tabs (step 8)
+  window.showOs = function (os) {
+    document.querySelectorAll(".os-panel").forEach((p) => p.classList.toggle("hidden", p.dataset.os !== os));
+    document.querySelectorAll(".os-tab").forEach((b) => { b.classList.toggle("!bg-ibm-blue", b.dataset.os === os); b.classList.toggle("!text-white", b.dataset.os === os); });
+    lsSet("grocery.os", os);
+  };
+  const guess = lsGet("grocery.os") || (/Win/.test(navigator.platform) ? "win" : /Mac/.test(navigator.platform) ? "mac" : "linux");
+  showOs(guess);
+})();
+</script>
+</body>
+</html>

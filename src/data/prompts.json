@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "description": "Prompt variants. Each variant is rendered with placeholders {context}, {question} and {few_shot}. 'context_mode' controls what {context} contains: 'document' (the grocery text), 'document_plus_distractor' (the text followed by distractor_text), or 'none' (empty; the question is asked without the document). The 'baseline' variant is the reference condition that other variants are compared against in the report.",
+  "few_shot_examples": [
+    {"question": "In what year was Maple Street Market founded?", "answer": "1998"},
+    {"question": "What is the store's fax number?", "answer": "Not stated in the text."}
+  ],
+  "distractor_text": "Unrelated note about a different store: Riverside Grocery, located across town at 90 River Road, was founded in 2004 and employs 22 people. It is open every day from 6:00 AM to 10:00 PM and never closes for holidays. Riverside sells whole milk for $2.99 per gallon and apples for $0.99 per pound, offers free delivery on every order, has 45 parking spaces, and runs a pharmacy that is open until 8:00 PM. Riverside Grocery closes at noon on Sundays during the winter.",
+  "variants": {
+    "baseline": {
+      "description": "Plain context + question with no extra instructions. Reference condition for all comparisons.",
+      "system": null,
+      "user": "Read the text below and answer the question.\n\nTEXT:\n{context}\n\nQUESTION: {question}\n\nANSWER:",
+      "context_mode": "document"
+    },
+    "strict_grounded": {
+      "description": "Instructs the model to use ONLY the text and to reply 'Not stated in the text.' when the answer is absent. Probes the hallucination vs. over-refusal trade-off.",
+      "system": "You answer questions using ONLY the provided text. If the text does not contain the information needed to answer, reply exactly: Not stated in the text. Do not use outside knowledge and do not guess. Answer in one short sentence.",
+      "user": "TEXT:\n{context}\n\nQUESTION: {question}",
+      "context_mode": "document"
+    },
+    "cot": {
+      "description": "Asks for step-by-step reasoning with quoted evidence, then a single 'FINAL ANSWER:' line. Exposes the model's process; only the final line is scored.",
+      "system": "Answer the question using the provided text. First think step by step: quote the sentence or sentences from the text that are relevant, then work out the answer from them. If the text does not contain the answer, say so. Finish with exactly one line in the form:\nFINAL ANSWER: <your answer>",
+      "user": "TEXT:\n{context}\n\nQUESTION: {question}",
+      "context_mode": "document"
+    },
+    "few_shot": {
+      "description": "Baseline plus two worked examples (one factual, one 'not stated'). Tests whether demonstrations improve grounding and brevity.",
+      "system": null,
+      "user": "Read the text below and answer the question. Follow the style of the examples.\n\nTEXT:\n{context}\n\nEXAMPLES:\n{few_shot}\n\nQUESTION: {question}\nANSWER:",
+      "context_mode": "document"
+    },
+    "persona": {
+      "description": "Friendly customer-service persona with the document in the system prompt. Probes whether an eager-to-please persona increases hallucination and acceptance of false premises.",
+      "system": "You are Maple, the cheerful virtual assistant for Maple Street Market. You love helping customers and always try to be as helpful and positive as possible. Here is everything you know about the store:\n\n{context}",
+      "user": "{question}",
+      "context_mode": "document"
+    },
+    "question_first": {
+      "description": "Same as baseline but the question appears BEFORE the text. Tests sensitivity to prompt ordering (recency vs. primacy).",
+      "system": null,
+      "user": "Answer the question using the text that follows it.\n\nQUESTION: {question}\n\nTEXT:\n{context}\n\nANSWER:",
+      "context_mode": "document"
+    },
+    "distractor": {
+      "description": "Baseline with an unrelated paragraph about a different store (with conflicting numbers) appended to the text. Tests entity confusion and context interference.",
+      "system": null,
+      "user": "Read the text below and answer the question about Maple Street Market.\n\nTEXT:\n{context}\n\nQUESTION: {question}\n\nANSWER:",
+      "context_mode": "document_plus_distractor"
+    },
+    "no_context": {
+      "description": "Control condition: the question is asked WITHOUT the document. A 'correct' answer here is a guess (or memorised data); the desirable behaviour is to say the information is unavailable. Excluded from headline accuracy.",
+      "system": null,
+      "user": "Answer the following question about Maple Street Market, a grocery store.\n\nQUESTION: {question}\n\nANSWER:",
+      "context_mode": "none"
+    }
+  }
+}

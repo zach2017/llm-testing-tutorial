@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Lab — Test a Local Ollama Model</title>
+<meta name="description" content="Connect to Ollama on your own computer, run the grocery-store questions against a small model, score the answers and export a report.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 fill=%27%23002d9c%27/%3E%3Ctext x=%278%27 y=%2712%27 font-size=%2710%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  if (window.tailwind) tailwind.config = { theme: { extend: { fontFamily: { sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'], mono: ['"IBM Plex Mono"', 'monospace'] },
+    colors: { ibm: { blue: '#0f62fe', navy: '#002d9c', ink: '#161616', gray: '#f4f4f4', line: '#e0e0e0' } } } } };
+</script>
+<style>
+  body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: #161616; background: #fff; }
+  .card { border:1px solid #e0e0e0; border-top:4px solid #0f62fe; background:#fff; }
+  .btn { background:#0f62fe; color:#fff; padding:.6em 1.1em; font-weight:500; } .btn:hover { background:#0353e9; } .btn:disabled { background:#8d8d8d; cursor:not-allowed; }
+  .btn-secondary { background:#fff; color:#0f62fe; border:1px solid #0f62fe; padding:.6em 1.1em; font-weight:500; } .btn-secondary:hover { background:#edf5ff; }
+  .info-btn { color:#0f62fe; text-decoration:underline dotted; cursor:pointer; }
+  .step-num { display:inline-flex; align-items:center; justify-content:center; width:2.2em; height:2.2em; background:#002d9c; color:#fff; font-weight:600; margin-right:.6em; flex:none; }
+  input, select { font-size: 1em; }
+  .ok { color:#198038; } .bad { color:#da1e28; } .warn { color:#b28600; }
+  @media print { .no-print { display:none !important; } body { font-size: 11pt; } .card { border:1px solid #999; break-inside: avoid; } details { display:block; } details > * { display:block; } }
+</style>
+</head>
+<body class="bg-white text-ibm-ink">
+
+<header class="sticky top-0 z-40 bg-white border-b border-ibm-line no-print">
+  <div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap items-center gap-3">
+    <a href="index.html" class="font-semibold text-ibm-navy text-lg">Grocery-Store AI Test</a>
+    <nav class="flex gap-3 text-sm">
+      <a href="index.html" class="px-2 py-1 hover:border-b-2 hover:border-ibm-blue">Tutorial</a>
+      <a href="lab.html" class="px-2 py-1 border-b-2 border-ibm-blue font-medium">Live Lab</a>
+    </nav>
+    <div class="ml-auto flex items-center gap-1 text-sm">
+      <span class="hidden sm:inline mr-1">Text size</span>
+      <button onclick="fontSmaller()" class="btn-secondary !py-1 !px-2" aria-label="Smaller text">A&minus;</button>
+      <span class="w-12 text-center font-mono" data-font-value>16px</span>
+      <button onclick="fontBigger()" class="btn-secondary !py-1 !px-2" aria-label="Larger text">A+</button>
+      <button onclick="fontReset()" class="px-2 py-1 underline text-ibm-blue">reset</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8 space-y-12 leading-relaxed">
+
+<section>
+  <p class="uppercase tracking-wide text-sm text-ibm-blue font-semibold">Live Lab</p>
+  <h1 class="text-3xl sm:text-4xl font-semibold text-ibm-navy mt-1">Test a real model running on your computer</h1>
+  <p class="mt-3 text-lg">This page talks directly to <b>Ollama</b> on your machine. Nothing is sent to the internet. Your settings and results are kept in your browser's <a class="info-btn" data-info="localstorage">localStorage</a>; if you also run the optional Go server, results are saved to disk and can be exported as Markdown or PDF.</p>
+  <p class="mt-2 text-sm">New to this? Start with the <a class="text-ibm-blue underline" href="index.html">tutorial</a>, which has a simulated model that needs no setup.</p>
+</section>
+
+<!-- ============ 1. configuration ============ -->
+<section id="config">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">1</span>Connection settings <span class="ml-2 text-sm font-normal text-gray-700">(saved in this browser)</span></h2>
+  <div class="card p-4 mt-4 grid md:grid-cols-2 gap-4 no-print">
+    <label class="block"><span class="font-semibold">Ollama address</span> <a class="info-btn text-sm" data-info="host">?</a>
+      <input id="cfg-host" class="mt-1 w-full border border-gray-400 p-2 font-mono" value="http://localhost:11434"></label>
+    <label class="block"><span class="font-semibold">Model</span> <a class="info-btn text-sm" data-info="model">?</a>
+      <div class="flex gap-2 mt-1"><input id="cfg-model" class="w-full border border-gray-400 p-2 font-mono" value="deepseek-r1:1.5b" list="model-list"><datalist id="model-list"></datalist>
+      <button class="btn-secondary whitespace-nowrap" onclick="loadModels()">List installed</button></div></label>
+    <label class="block"><span class="font-semibold">Go API server (optional)</span> <a class="info-btn text-sm" data-info="server">?</a>
+      <input id="cfg-server" class="mt-1 w-full border border-gray-400 p-2 font-mono" placeholder="http://localhost:8080 (leave empty to skip)"></label>
+    <div class="grid grid-cols-3 gap-3">
+      <label class="block"><span class="font-semibold">Max tokens</span> <a class="info-btn text-sm" data-info="tokens">?</a><input id="cfg-predict" type="number" class="mt-1 w-full border border-gray-400 p-2" value="1500" min="50"></label>
+      <label class="block"><span class="font-semibold">Temperature</span> <a class="info-btn text-sm" data-info="temperature">?</a><input id="cfg-temp" type="number" step="0.1" min="0" max="2" class="mt-1 w-full border border-gray-400 p-2" value="0"></label>
+      <label class="block"><span class="font-semibold">Thinking</span> <a class="info-btn text-sm" data-info="think">?</a>
+        <select id="cfg-think" class="mt-1 w-full border border-gray-400 p-2 bg-white"><option value="">model default</option><option value="on">on</option><option value="off">off</option></select></label>
+    </div>
+    <label class="block md:col-span-2"><span class="font-semibold">Connect through</span>
+      <select id="cfg-route" class="mt-1 w-full border border-gray-400 p-2 bg-white">
+        <option value="direct">the browser straight to Ollama (default; needs Ollama's CORS permission, usually automatic for localhost)</option>
+        <option value="server">the Go API server, which forwards to Ollama (no CORS issues; requires the server to be running)</option>
+      </select></label>
+    <div class="md:col-span-2 flex flex-wrap gap-2">
+      <button class="btn" onclick="saveConfig(true)">Save settings</button>
+      <button class="btn-secondary" onclick="resetConfig()">Reset to defaults</button>
+      <span id="cfg-status" class="self-center text-sm"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. prerequisites ============ -->
+<section id="prereq">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">2</span>Check what is ready</h2>
+  <p class="mt-2">Press the button. Each line turns green when it passes; red lines tell you exactly what to do.</p>
+  <div class="card p-4 mt-4">
+    <button class="btn no-print" onclick="runChecks()">Run prerequisite checks</button>
+    <ul id="check-list" class="mt-4 space-y-2 text-[0.95em]"></ul>
+  </div>
+  <details class="card p-4 mt-3">
+    <summary class="font-semibold">Setup guide: from zero to a working connection</summary>
+    <ol class="list-decimal ml-6 mt-3 space-y-2">
+      <li><b>Install Ollama</b> from <a class="text-ibm-blue underline" target="_blank" rel="noopener" href="https://ollama.com/download">ollama.com/download</a> (Windows, macOS, Linux). No graphics card needed.</li>
+      <li><b>Make sure it is running.</b> On Windows and macOS the Ollama app sits by the clock / in the menu bar. On Linux run <code class="font-mono">ollama serve</code>. Opening <a class="text-ibm-blue underline" target="_blank" rel="noopener" href="http://localhost:11434">http://localhost:11434</a> in a new tab should show "Ollama is running".</li>
+      <li><b>Download a model.</b> In a terminal: <code class="font-mono bg-ibm-gray px-1">ollama pull deepseek-r1:1.5b</code> (1.1 GB, thinks before answering) or <code class="font-mono bg-ibm-gray px-1">ollama pull gemma3:1b</code> (0.8 GB, fast).</li>
+      <li><b>Enter the settings above</b> and press <i>Save settings</i>. They are stored in this browser only (<a class="info-btn" data-info="localstorage">how localStorage works</a>).</li>
+      <li><b>Run the checks.</b> If "Ollama reachable" fails with a CORS message, either allow it (<a class="info-btn" data-info="cors">instructions</a>) or start the Go server and choose "connect through the Go API server".</li>
+      <li><b>Optional — the Go server.</b> Install Go from <a class="text-ibm-blue underline" target="_blank" rel="noopener" href="https://go.dev/dl/">go.dev</a>, then in the kit's <code class="font-mono">server</code> folder run <code class="font-mono bg-ibm-gray px-1">go run .</code> and open <a class="text-ibm-blue underline" href="http://localhost:8080">http://localhost:8080</a>. It saves every run and exports Markdown / PDF.</li>
+    </ol>
+  </details>
+</section>
+
+<!-- ============ 3. run ============ -->
+<section id="run">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">3</span>Choose questions and run</h2>
+  <div class="card p-4 mt-4 no-print">
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <p class="font-semibold">Questions <span class="text-sm font-normal text-gray-700">(<span id="q-count">0</span> selected)</span></p>
+        <div class="flex flex-wrap gap-2 mt-1 text-sm">
+          <button class="btn-secondary !py-1 !px-2" onclick="selectQ('all')">all 42</button>
+          <button class="btn-secondary !py-1 !px-2" onclick="selectQ('none')">none</button>
+          <button class="btn-secondary !py-1 !px-2" onclick="selectQ('starter')">starter 6</button>
+          <span id="cat-buttons"></span>
+        </div>
+        <div id="q-list" class="mt-2 max-h-72 overflow-y-auto border border-ibm-line p-2 text-sm space-y-1"></div>
+      </div>
+      <div>
+        <p class="font-semibold">Prompt styles</p>
+        <div id="v-list" class="mt-2 space-y-1 text-sm"></div>
+        <p class="font-semibold mt-4">Repeats <a class="info-btn text-sm" data-info="repeats">?</a></p>
+        <input id="run-repeats" type="number" value="1" min="1" max="5" class="border border-gray-400 p-2 w-24">
+        <p class="mt-4 text-sm" id="run-estimate"></p>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-4 items-center">
+      <button id="run-btn" class="btn" onclick="startRun()">Run</button>
+      <button id="stop-btn" class="btn-secondary" onclick="stopRun()" disabled>Stop</button>
+      <span id="run-status" class="text-sm"></span>
+    </div>
+    <div class="w-full bg-ibm-gray h-2 mt-3"><div id="run-bar" class="bg-ibm-blue h-2" style="width:0%"></div></div>
+  </div>
+</section>
+
+<!-- ============ 4. answers ============ -->
+<section id="answers">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">4</span>Answers as they arrive</h2>
+  <div id="live-summary" class="card p-4 mt-4 hidden"></div>
+  <div id="answer-list" class="mt-4 space-y-3"></div>
+</section>
+
+<!-- ============ 5. results & export ============ -->
+<section id="results">
+  <h2 class="text-2xl font-semibold text-ibm-navy flex items-center"><span class="step-num">5</span>Saved runs, report and export</h2>
+  <div class="card p-4 mt-4 no-print">
+    <div class="flex flex-wrap gap-2 items-center">
+      <label>Run: <select id="run-select" class="border border-gray-400 p-2 bg-white max-w-full" onchange="showRun()"></select></label>
+      <button class="btn-secondary" onclick="refreshRuns()">Refresh list</button>
+      <button class="btn-secondary" onclick="deleteRun()">Delete from browser</button>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-3">
+      <button class="btn" onclick="exportMd()">Download report.md</button>
+      <button class="btn" onclick="exportJson()">Download run.json</button>
+      <button class="btn" onclick="exportCsv()">Download results.csv</button>
+      <button class="btn-secondary" onclick="window.print()">Print / save as PDF</button>
+      <button class="btn-secondary" onclick="saveToServer()">Save to Go server</button>
+      <button class="btn-secondary" onclick="serverPdf()">PDF from Go server</button>
+      <span id="export-status" class="self-center text-sm"></span>
+    </div>
+    <p class="text-sm text-gray-700 mt-2">"Print / save as PDF" uses your browser's print dialog (choose "Save as PDF" as the printer). Results in the browser survive reloads but not clearing site data — save important runs to the Go server or download them.</p>
+  </div>
+  <div id="report" class="mt-4"></div>
+</section>
+
+</main>
+
+<footer class="border-t border-ibm-line mt-10 no-print">
+  <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-gray-700">
+    <p class="font-semibold text-ibm-ink">References</p>
+    <ul id="footer-links" class="list-disc ml-5 mt-2 space-y-1"></ul>
+    <p class="mt-3">&copy; <span id="year"></span> grocery-llm-eval. Maple Street Market is fictional.</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="scoring.js"></script>
+<script src="common.js"></script>
+<script>
+(function () {
+  const D = window.GROCERY_DATA, S = window.GroceryScoring, byId = (id) => document.getElementById(id);
+  const LS_CFG = "grocery.lab.config", LS_RUNS = "grocery.lab.runs";
+  const DEFAULTS = { host: "http://localhost:11434", model: "deepseek-r1:1.5b", server: "", predict: 1500, temp: 0, think: "", route: "direct" };
+  const qById = Object.fromEntries(D.questions.map((q) => [q.id, q]));
+  const STARTER = ["Q01", "Q05", "Q15", "Q28", "Q31", "Q36"];
+
+  // ---------- popups
+  window.INFO = {
+    localstorage: { title: "What is localStorage?", links: ["localStorage"], html: "<p>Every web page can keep a small notebook inside your browser, called localStorage. This page writes your settings and your results there. It stays on your computer, it is never uploaded, and it survives closing the tab. It is wiped if you clear the browser's site data, use a private window, or switch browsers — which is why the Go server exists for keeping runs permanently.</p>" },
+    host: { title: "Ollama address", links: ["ollamaFaq"], html: "<p>Ollama listens on port 11434 of your own computer, so the address is normally <code class='font-mono'>http://localhost:11434</code>. If Ollama runs on another machine on your network, use its address (and set <code class='font-mono'>OLLAMA_HOST=0.0.0.0</code> there).</p>" },
+    model: { title: "Which model?", links: ["deepseek", "gemma", "llama"], html: "<p>Type the exact tag you pulled with <code class='font-mono'>ollama pull</code>, or press <i>List installed</i>. <b>deepseek-r1:1.5b</b> shows its thinking (slow but instructive); <b>gemma3:1b</b> and <b>llama3.2:1b</b> are quick, non-thinking models; <b>llama3.2:3b</b> and <b>qwen3:1.7b</b> are good next steps.</p>" },
+    server: { title: "The optional Go API server", links: ["go"], html: "<p>If you start the server (<code class='font-mono'>cd server &amp;&amp; go run .</code>), enter its address here (default <code class='font-mono'>http://localhost:8080</code>). The lab can then save runs to disk and export PDF/Markdown through it. If you opened this page <em>from</em> the server, the address is filled in automatically.</p>" },
+    tokens: { title: "Max tokens", links: [], html: "<p>The most the model may write per answer. Thinking models write a lot before the answer, so 1500 is a safe budget; if answers end with <i>cut off</i>, raise it. Non-thinking models are fine with 300.</p>" },
+    temperature: { title: "Temperature", links: [], html: "<p>0 makes the model pick its most likely word every time, so repeats give the same answer. 0.7 adds randomness; combine with Repeats to see how stable the answers are.</p>" },
+    think: { title: "Thinking on/off", links: ["ollamaApi"], html: "<p>For models that support it (deepseek-r1, qwen3), Ollama can turn the thinking phase off, which makes answers much faster but often less accurate. 'model default' sends nothing and lets the model decide. Older Ollama versions ignore this setting.</p>" },
+    repeats: { title: "Repeats", links: [], html: "<p>Ask each question more than once. With temperature 0 the answers should be identical; with temperature above 0 they may change, and the report shows how often the verdict flipped.</p>" },
+    cors: { title: "Allowing the browser to reach Ollama (CORS)", links: ["ollamaFaq", "cors"], html: "<p>Ollama accepts requests from localhost pages and local files by default. If the check says blocked, set the environment variable <code class='font-mono'>OLLAMA_ORIGINS=*</code> and restart Ollama: on Windows through System &rarr; Environment Variables, on macOS <code class='font-mono'>launchctl setenv OLLAMA_ORIGINS \"*\"</code>, on Linux <code class='font-mono'>OLLAMA_ORIGINS=* ollama serve</code>. Or avoid the issue by routing through the Go server.</p>" },
+  };
+  byId("footer-links").innerHTML = ["ollama", "ollamaApi", "ollamaFaq", "deepseek", "go", "localStorage", "fetch", "cors"].map((k) => `<li><a class="text-ibm-blue underline" target="_blank" rel="noopener" href="${DOC_LINKS[k][1]}">${DOC_LINKS[k][0]}</a></li>`).join("");
+
+  // ---------- config
+  function readConfig() { return { host: byId("cfg-host").value.trim().replace(/\/$/, ""), model: byId("cfg-model").value.trim(), server: byId("cfg-server").value.trim().replace(/\/$/, ""), predict: +byId("cfg-predict").value || 1500, temp: +byId("cfg-temp").value || 0, think: byId("cfg-think").value, route: byId("cfg-route").value }; }
+  function writeConfig(c) { byId("cfg-host").value = c.host; byId("cfg-model").value = c.model; byId("cfg-server").value = c.server; byId("cfg-predict").value = c.predict; byId("cfg-temp").value = c.temp; byId("cfg-think").value = c.think; byId("cfg-route").value = c.route; }
+  window.saveConfig = function (announce) { const ok = lsSet(LS_CFG, JSON.stringify(readConfig())); if (announce) byId("cfg-status").innerHTML = ok ? '<span class="ok">Saved in this browser.</span>' : '<span class="bad">Could not save (private window or storage blocked) — settings will reset on reload.</span>'; };
+  window.resetConfig = function () { writeConfig(DEFAULTS); saveConfig(true); };
+  (function loadConfig() {
+    let c = Object.assign({}, DEFAULTS), saved = {};
+    try { saved = JSON.parse(lsGet(LS_CFG) || "{}"); } catch (e) {}
+    Object.assign(c, saved);
+    // Opened through the Go server? Then use it by default (no CORS worries) unless the user chose otherwise.
+    if (location.protocol.startsWith("http") && location.port && !saved.server) { c.server = location.origin; if (!saved.route) c.route = "server"; }
+    writeConfig(c);
+  })();
+  document.querySelectorAll("#config input, #config select").forEach((el) => el.addEventListener("change", () => saveConfig(false)));
+
+  // ---------- transport
+  async function fetchJson(url, opts, timeoutMs) {
+    const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), timeoutMs || 10000);
+    try { const r = await fetch(url, Object.assign({ signal: ctrl.signal }, opts || {})); const text = await r.text(); if (!r.ok) throw new Error(`HTTP ${r.status}: ${text.slice(0, 200)}`); return JSON.parse(text); }
+    finally { clearTimeout(t); }
+  }
+  function ollamaBase(c) { return c.route === "server" && c.server ? c.server + "/api/ollama" : c.host; }
+  function classify(err) {
+    const m = String(err && err.message || err);
+    if (/abort/i.test(m)) return "timed out";
+    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return "not reachable, or blocked by the browser (CORS)";
+    return m;
+  }
+  async function ollamaChat(c, messages, signal) {
+    const body = { model: c.model, messages, stream: false, options: { temperature: c.temp, num_predict: c.predict, seed: 42 } };
+    if (c.think) body.think = c.think === "on";
+    const t0 = performance.now();
+    const r = await fetch(ollamaBase(c) + "/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
+    const text = await r.text(); if (!r.ok) throw new Error(`HTTP ${r.status}: ${text.slice(0, 200)}`);
+    const j = JSON.parse(text), msg = j.message || {};
+    let content = msg.content || ""; if (msg.thinking && !content.includes("<think>")) content = `<think>${msg.thinking}</think>\n${content}`;
+    return { raw: content, latency_s: (performance.now() - t0) / 1000, completion_tokens: j.eval_count || 0, tokens_per_s: j.eval_duration ? (j.eval_count || 0) / (j.eval_duration / 1e9) : null, done_reason: j.done_reason || "" };
+  }
+
+  // ---------- checks
+  window.loadModels = async function () {
+    const c = readConfig();
+    try { const j = await fetchJson(ollamaBase(c) + "/api/tags"); const names = (j.models || []).map((m) => m.name || m.model); byId("model-list").innerHTML = names.map((n) => `<option value="${escapeHtml(n)}">`).join(""); byId("cfg-status").innerHTML = names.length ? `<span class="ok">Installed: ${names.map(escapeHtml).join(", ")}</span>` : '<span class="warn">Ollama answered but has no models. Run: ollama pull deepseek-r1:1.5b</span>'; }
+    catch (e) { byId("cfg-status").innerHTML = `<span class="bad">Could not list models: ${escapeHtml(classify(e))}</span>`; }
+  };
+  window.runChecks = async function () {
+    const c = readConfig(); const items = []; const li = (cls, text) => items.push(`<li class="${cls}">${cls === "ok" ? "&#10004;" : cls === "warn" ? "&#9888;" : "&#10008;"} ${text}</li>`);
+    byId("check-list").innerHTML = "<li>Checking...</li>";
+    // browser
+    li(window.fetch ? "ok" : "bad", "Modern browser with fetch API");
+    let ls = false; try { localStorage.setItem("grocery.test", "1"); localStorage.removeItem("grocery.test"); ls = true; } catch (e) {}
+    li(ls ? "ok" : "warn", ls ? "localStorage available — settings and results will be remembered" : "localStorage blocked (private window?) — nothing will be remembered between reloads");
+    li(location.protocol === "file:" ? "warn" : "ok", location.protocol === "file:" ? "Page opened as a local file. That works with Ollama's default settings; if calls are blocked, use the Go server instead." : `Page served from ${escapeHtml(location.origin)}`);
+    // server
+    if (c.server) { try { const h = await fetchJson(c.server + "/api/health", null, 4000); li("ok", `Go API server reachable at ${escapeHtml(c.server)} (version ${escapeHtml(h.version || "?")}, ${h.runs ?? "?"} saved runs)`); } catch (e) { li(c.route === "server" ? "bad" : "warn", `Go API server not reachable at ${escapeHtml(c.server)} (${escapeHtml(classify(e))}). Start it with: cd server &amp;&amp; go run .${c.route === "server" ? " — or switch the connection to 'straight to Ollama'." : ""}`); } }
+    else li("warn", "No Go API server configured (optional). Results stay in the browser only.");
+    // ollama
+    let up = false;
+    try { const v = await fetchJson(ollamaBase(c) + "/api/version", null, 5000); up = true; li("ok", `Ollama reachable${c.route === "server" ? " through the Go server" : ""} (version ${escapeHtml(v.version || "?")})`); }
+    catch (e) { const why = classify(e); li("bad", `Ollama not reachable at ${escapeHtml(ollamaBase(c))}: ${escapeHtml(why)}. ${/CORS/.test(why) ? 'If <a class="text-ibm-blue underline" target="_blank" href="' + escapeHtml(c.host) + '">' + escapeHtml(c.host) + '</a> shows "Ollama is running" in a new tab, the browser is blocking the call: <a class="info-btn" data-info="cors">allow it</a> or route through the Go server.' : "Start Ollama (the app, or <code class='font-mono'>ollama serve</code>)."}`); }
+    if (up) {
+      try { const j = await fetchJson(ollamaBase(c) + "/api/tags", null, 5000); const names = (j.models || []).map((m) => m.name || m.model); const have = names.includes(c.model) || names.some((n) => n.split(":")[0] === c.model);
+        li(have ? "ok" : "bad", have ? `Model <code class="font-mono">${escapeHtml(c.model)}</code> is installed` : `Model <code class="font-mono">${escapeHtml(c.model)}</code> not installed. Run: <code class="font-mono">ollama pull ${escapeHtml(c.model)}</code>${names.length ? " (installed: " + names.map(escapeHtml).join(", ") + ")" : ""}`);
+        if (have) { byId("check-list").innerHTML = items.join("") + "<li>Sending a tiny test question to measure speed (may take up to a minute while the model loads)...</li>";
+          try { const r = await ollamaChat(Object.assign({}, c, { predict: 50, think: c.think || undefined }), [{ role: "user", content: "Reply with the single word OK." }]); li("ok", `Model answered in ${r.latency_s.toFixed(1)} s${r.tokens_per_s ? ", about " + r.tokens_per_s.toFixed(1) + " tokens/s on this machine" : ""} (answer: <code class="font-mono">${escapeHtml(S.splitResponse(r.raw).final.slice(0, 40))}</code>)`); }
+          catch (e) { li("bad", `Model did not answer: ${escapeHtml(classify(e))}`); } }
+      } catch (e) { li("bad", `Could not list models: ${escapeHtml(classify(e))}`); }
+    }
+    li("ok", `Scorer loaded: ${D.questions.length} questions, ${Object.keys(D.prompts.variants).length} prompt styles`);
+    byId("check-list").innerHTML = items.join("");
+  };
+
+  // ---------- pickers
+  byId("q-list").innerHTML = D.questions.map((q) => `<label class="flex gap-2"><input type="checkbox" class="q-check mt-1" value="${q.id}" ${STARTER.includes(q.id) ? "checked" : ""}><span><b>${q.id}</b> <span class="text-gray-700">[${q.category}]</span> ${escapeHtml(q.question)}</span></label>`).join("");
+  byId("cat-buttons").innerHTML = Object.keys(D.categories).map((cat) => `<button class="btn-secondary !py-1 !px-2" onclick="selectQ('${cat}')">${cat}</button>`).join(" ");
+  byId("v-list").innerHTML = Object.entries(D.prompts.variants).map(([v, d]) => `<label class="flex gap-2"><input type="checkbox" class="v-check mt-1" value="${v}" ${v === "baseline" ? "checked" : ""}><span><b>${v}</b> <span class="text-gray-700">— ${escapeHtml(d.description)}</span></span></label>`).join("");
+  window.selectQ = function (what) { document.querySelectorAll(".q-check").forEach((cb) => { const q = qById[cb.value]; cb.checked = what === "all" ? true : what === "none" ? false : what === "starter" ? STARTER.includes(q.id) : q.category === what; }); updateEstimate(); };
+  function selected(cls) { return [...document.querySelectorAll("." + cls + ":checked")].map((cb) => cb.value); }
+  function updateEstimate() { const nq = selected("q-check").length, nv = selected("v-check").length, rep = +byId("run-repeats").value || 1; byId("q-count").textContent = nq; const calls = nq * nv * rep; byId("run-estimate").innerHTML = `<b>${calls}</b> calls. On a laptop CPU a thinking model takes 20–90 s each (about ${Math.round(calls * 0.5)}–${Math.round(calls * 1.5)} min); a non-thinking 1B model a few seconds each.`; }
+  document.addEventListener("change", (e) => { if (e.target.matches(".q-check, .v-check, #run-repeats")) updateEstimate(); }); updateEstimate();
+
+  // ---------- runs storage
+  function loadRuns() { try { return JSON.parse(lsGet(LS_RUNS) || "[]"); } catch (e) { return []; } }
+  function storeRuns(runs) { if (!lsSet(LS_RUNS, JSON.stringify(runs))) { while (runs.length > 1 && !lsSet(LS_RUNS, JSON.stringify(runs))) runs.shift(); } }
+  function buildMessages(variantName, q) {
+    const v = D.prompts.variants[variantName];
+    const ctx = v.context_mode === "none" ? "" : D.document + (v.context_mode === "document_plus_distractor" ? "\n\n" + D.prompts.distractor_text : "");
+    const few = D.prompts.few_shot_examples.map((e) => `QUESTION: ${e.question}\nANSWER: ${e.answer}`).join("\n\n");
+    const r = (t) => t && t.replace("{context}", ctx).replace("{question}", q.question).replace("{few_shot}", few);
+    const m = []; if (v.system) m.push({ role: "system", content: r(v.system) }); m.push({ role: "user", content: r(v.user) }); return m;
+  }
+
+  // ---------- running
+  let current = null, abort = null;
+  window.stopRun = function () { if (abort) abort.abort(); };
+  window.startRun = async function () {
+    const c = readConfig(); saveConfig(false);
+    const qs = selected("q-check"), vs = selected("v-check"), rep = Math.max(1, +byId("run-repeats").value || 1);
+    if (!qs.length || !vs.length || !c.model) { byId("run-status").innerHTML = '<span class="bad">Pick at least one question, one prompt style and a model.</span>'; return; }
+    abort = new AbortController(); byId("run-btn").disabled = true; byId("stop-btn").disabled = false;
+    const run = { id: new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "-" + Math.random().toString(36).slice(2, 6), started_at: new Date().toISOString(), model: c.model, host: c.host, route: c.route, settings: { num_predict: c.predict, temperature: c.temp, think: c.think, repeats: rep }, variants: vs, question_ids: qs, rows: [], finished: false };
+    current = run; byId("answer-list").innerHTML = ""; byId("live-summary").classList.remove("hidden");
+    const total = qs.length * vs.length * rep; let done = 0;
+    outer: for (const v of vs) for (const qid of qs) for (let r = 0; r < rep; r++) {
+      const q = qById[qid]; const msgs = buildMessages(v, q);
+      byId("run-status").textContent = `Asking ${qid} (${v}${rep > 1 ? ", repeat " + (r + 1) : ""})... ${done}/${total} done`;
+      let resp = null, error = null;
+      try { resp = await ollamaChat(c, msgs, abort.signal); } catch (e) { error = classify(e); if (/abort/i.test(String(e))) { error = "stopped by user"; } }
+      const sc = S.scoreResponse(q, resp ? resp.raw : "", error);
+      const row = Object.assign({ question_id: qid, variant: v, repeat: r, category: q.category, question: q.question, expected_response: q.expected_response, raw_response: resp ? resp.raw : "", latency_s: resp ? resp.latency_s : null, completion_tokens: resp ? resp.completion_tokens : null, tokens_per_s: resp ? resp.tokens_per_s : null, done_reason: resp ? resp.done_reason : "", error }, sc);
+      run.rows.push(row); renderAnswer(row); done++;
+      byId("run-bar").style.width = (100 * done / total).toFixed(1) + "%"; renderLiveSummary(run);
+      const runs = loadRuns(); const i = runs.findIndex((x) => x.id === run.id); if (i >= 0) runs[i] = run; else runs.push(run); storeRuns(runs);
+      if (error === "stopped by user") break outer;
+    }
+    run.finished = true; run.finished_at = new Date().toISOString();
+    const runs = loadRuns(); const i = runs.findIndex((x) => x.id === run.id); if (i >= 0) runs[i] = run; storeRuns(runs);
+    byId("run-status").innerHTML = `<span class="ok">Done: ${run.rows.length} answers, ${run.rows.filter((x) => x.correct).length} correct. Saved in this browser as run ${run.id}.</span>`;
+    byId("run-btn").disabled = false; byId("stop-btn").disabled = true; abort = null;
+    refreshRuns(run.id);
+    if (c.server) saveToServer(true);
+  };
+  function renderAnswer(row) {
+    const verdict = row.correct ? '<span class="ok font-semibold">CORRECT</span>' : `<span class="bad font-semibold">INCORRECT &rarr; ${row.failure_mode}</span> <span class="text-gray-700 text-sm">(${escapeHtml(S.FAILURE_MODE_HELP[row.failure_mode] || "")})</span>`;
+    const meta = row.error ? `<span class="bad">${escapeHtml(row.error)}</span>` : `${(row.latency_s || 0).toFixed(1)} s, ${row.completion_tokens} tokens${row.tokens_per_s ? ", " + row.tokens_per_s.toFixed(1) + " tok/s" : ""}${row.done_reason === "length" ? ', <span class="warn">cut off — raise Max tokens</span>' : ""}`;
+    byId("answer-list").insertAdjacentHTML("afterbegin", `<div class="card p-3 text-[0.95em]">
+      <div class="flex flex-wrap justify-between gap-2"><b>${row.question_id} <span class="font-normal text-gray-700">[${row.category}, ${row.variant}${row.repeat ? ", repeat " + (row.repeat + 1) : ""}]</span></b><span class="text-sm">${meta}</span></div>
+      <p class="mt-1">${escapeHtml(row.question)}</p>
+      ${row.thinking ? `<details class="mt-1 text-sm text-gray-700"><summary>Model's thinking (${row.reasoning_words} words)</summary><pre class="whitespace-pre-wrap font-sans mt-1 italic">${escapeHtml(row.thinking)}</pre></details>` : ""}
+      ${row.reasoning ? `<details class="mt-1 text-sm text-gray-700"><summary>Reasoning before FINAL ANSWER</summary><pre class="whitespace-pre-wrap font-sans mt-1">${escapeHtml(row.reasoning)}</pre></details>` : ""}
+      <p class="mt-2"><b>Answer:</b> <span class="font-mono">${escapeHtml(row.final_answer || "(empty)")}</span></p>
+      <p class="mt-1"><b>Expected:</b> ${escapeHtml(row.expected_response)}</p>
+      <p class="mt-1">${verdict} <span class="text-sm text-gray-700">— ${escapeHtml(row.scoring_detail)}</span></p></div>`);
+  }
+  function renderLiveSummary(run) {
+    const n = run.rows.length, k = run.rows.filter((r) => r.correct).length;
+    const fm = {}; run.rows.forEach((r) => { if (r.failure_mode) fm[r.failure_mode] = (fm[r.failure_mode] || 0) + 1; });
+    byId("live-summary").innerHTML = `<b>${run.model}</b>: ${k}/${n} correct (${n ? Math.round(100 * k / n) : 0}%). Failures: ${Object.entries(fm).map(([a, b]) => `${a} ${b}`).join(", ") || "none yet"}.`;
+  }
+
+  // ---------- report
+  function wilson(k, n) { if (!n) return [0, 0]; const z = 1.96, p = k / n, d = 1 + z * z / n, c = (p + z * z / (2 * n)) / d, h = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d; return [Math.max(0, c - h), Math.min(1, c + h)]; }
+  const pct = (x) => (100 * x).toFixed(1) + "%";
+  function summarize(run) {
+    const rows = run.rows.filter((r) => r.variant !== "no_context"), n = rows.length, k = rows.filter((r) => r.correct).length, [lo, hi] = wilson(k, n);
+    const group = (key) => { const g = {}; rows.forEach((r) => { const v = r[key]; g[v] = g[v] || { n: 0, k: 0 }; g[v].n++; if (r.correct) g[v].k++; }); return g; };
+    const unans = rows.filter((r) => r.category === "unanswerable"), prem = rows.filter((r) => r.category === "false_premise"), answerable = rows.filter((r) => !["unanswerable", "false_premise"].includes(r.category));
+    const fm = {}; run.rows.forEach((r) => { if (r.failure_mode) fm[r.failure_mode] = (fm[r.failure_mode] || 0) + 1; });
+    const lat = rows.map((r) => r.latency_s).filter((x) => x != null).sort((a, b) => a - b);
+    return { n, k, acc: n ? k / n : 0, lo, hi, byCategory: group("category"), byVariant: group("variant"),
+      hallucination: unans.length ? unans.filter((r) => !r.correct).length / unans.length : null,
+      overRefusal: answerable.length ? answerable.filter((r) => r.refused && !r.correct).length / answerable.length : null,
+      premise: prem.length ? prem.filter((r) => r.failure_mode === "premise_accepted").length / prem.length : null,
+      failureModes: fm, medianLatency: lat.length ? lat[Math.floor(lat.length / 2)] : null, meanTps: (() => { const t = rows.map((r) => r.tokens_per_s).filter(Boolean); return t.length ? t.reduce((a, b) => a + b, 0) / t.length : null; })() };
+  }
+  function reportMarkdown(run) {
+    const s = summarize(run), na = (x) => x == null ? "n/a" : pct(x);
+    const L = [`# Grocery-Store Benchmark — ${run.model}`, "", `Run ${run.id}, started ${run.started_at}${run.finished ? "" : " (incomplete)"}. Settings: max tokens ${run.settings.num_predict}, temperature ${run.settings.temperature}, thinking ${run.settings.think || "default"}, repeats ${run.settings.repeats}. Connection: ${run.route}.`, "",
+      "## Headline", "", "| Metric | Value |", "|---|---|", `| Accuracy (excl. no_context) | ${pct(s.acc)} (${s.k}/${s.n}) |`, `| 95% Wilson interval | ${pct(s.lo)} – ${pct(s.hi)} |`, `| Hallucination rate (unanswerable Qs) | ${na(s.hallucination)} |`, `| Over-refusal rate (answerable Qs) | ${na(s.overRefusal)} |`, `| Premise acceptance (false-premise Qs) | ${na(s.premise)} |`, `| Median latency | ${s.medianLatency == null ? "n/a" : s.medianLatency.toFixed(1) + " s"} |`, `| Mean tokens/s | ${s.meanTps == null ? "n/a" : s.meanTps.toFixed(1)} |`, "",
+      "## Accuracy by category", "", "| Category | Correct | n | Accuracy |", "|---|---|---|---|", ...Object.entries(s.byCategory).map(([c, g]) => `| ${c} | ${g.k} | ${g.n} | ${pct(g.k / g.n)} |`), "",
+      "## Accuracy by prompt style", "", "| Variant | Correct | n | Accuracy |", "|---|---|---|---|", ...Object.entries(s.byVariant).map(([c, g]) => `| ${c} | ${g.k} | ${g.n} | ${pct(g.k / g.n)} |`), "",
+      "## Failure modes", "", "| Failure mode | Count | Meaning |", "|---|---|---|", ...Object.entries(s.failureModes).map(([f, c]) => `| ${f} | ${c} | ${S.FAILURE_MODE_HELP[f] || ""} |`), "",
+      "## All answers", "", "| Q | Variant | Rep | Verdict | Model's final answer | Expected | Scorer note |", "|---|---|---|---|---|---|---|",
+      ...run.rows.map((r) => `| ${r.question_id} | ${r.variant} | ${r.repeat + 1} | ${r.correct ? "correct" : r.failure_mode} | ${(r.final_answer || "").replace(/\|/g, "\\|").replace(/\s+/g, " ").slice(0, 160)} | ${r.expected_response.replace(/\|/g, "\\|")} | ${(r.scoring_detail || "").replace(/\|/g, "\\|")} |`), "",
+      "## Method", "", "Each question is asked with the store text in the prompt; the final answer (after any <think> block or FINAL ANSWER: marker) is scored by deterministic rules (numeric match, phrase match, yes/no, choice, list F1, abstention detection, premise correction). The `no_context` control is excluded from accuracy. Generated by the grocery-llm-eval Live Lab."];
+    return L.join("\n");
+  }
+  function reportHtml(run) {
+    const s = summarize(run), na = (x) => x == null ? "n/a" : pct(x);
+    const table = (hdr, rows) => `<table class="w-full text-sm border border-ibm-line mt-2"><thead class="bg-ibm-gray text-left"><tr>${hdr.map((h) => `<th class="p-2 border-b">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td class="p-2 border-b align-top">${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    return `<div class="card p-4"><h3 class="text-xl font-semibold text-ibm-navy">Report: ${escapeHtml(run.model)} <span class="text-sm font-normal text-gray-700">run ${escapeHtml(run.id)}${run.finished ? "" : " (incomplete)"}</span></h3>
+      <p class="text-sm text-gray-700">Started ${escapeHtml(run.started_at)} · max tokens ${run.settings.num_predict} · temperature ${run.settings.temperature} · thinking ${escapeHtml(run.settings.think || "default")} · repeats ${run.settings.repeats} · styles: ${run.variants.join(", ")}</p>
+      <div class="grid sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4 text-center">
+        ${[["Accuracy", pct(s.acc)], ["95% interval", `${pct(s.lo)}–${pct(s.hi)}`], ["Hallucination", na(s.hallucination)], ["Over-refusal", na(s.overRefusal)], ["Premise accepted", na(s.premise)], ["Median latency", s.medianLatency == null ? "n/a" : s.medianLatency.toFixed(1) + " s"]].map(([l, v]) => `<div class="border border-ibm-line p-2"><div class="text-xl font-semibold text-ibm-navy">${v}</div><div class="text-xs">${l}</div></div>`).join("")}
+      </div>
+      <h4 class="font-semibold mt-5">By category</h4>${table(["Category", "Correct", "n", "Accuracy"], Object.entries(s.byCategory).map(([c, g]) => [c, g.k, g.n, pct(g.k / g.n)]))}
+      <h4 class="font-semibold mt-5">By prompt style</h4>${table(["Variant", "Correct", "n", "Accuracy"], Object.entries(s.byVariant).map(([c, g]) => [c, g.k, g.n, pct(g.k / g.n)]))}
+      <h4 class="font-semibold mt-5">Failure modes</h4>${Object.keys(s.failureModes).length ? table(["Failure mode", "Count", "Meaning"], Object.entries(s.failureModes).map(([f, c]) => [f, c, S.FAILURE_MODE_HELP[f] || ""])) : "<p class='text-sm'>No failures.</p>"}
+      <h4 class="font-semibold mt-5">All answers</h4>${table(["Q", "Style", "Verdict", "Final answer", "Expected", "Note"], run.rows.map((r) => [r.question_id + (r.repeat ? " r" + (r.repeat + 1) : ""), r.variant, r.correct ? '<span class="ok">correct</span>' : `<span class="bad">${r.failure_mode}</span>`, `<span class="font-mono">${escapeHtml((r.final_answer || "").slice(0, 200))}</span>`, escapeHtml(r.expected_response), escapeHtml(r.scoring_detail || "")]))}
+    </div>`;
+  }
+  window.refreshRuns = function (selectId) {
+    const runs = loadRuns(); const sel = byId("run-select");
+    sel.innerHTML = runs.slice().reverse().map((r) => `<option value="${r.id}">${r.id} — ${escapeHtml(r.model)} — ${r.rows.filter((x) => x.correct).length}/${r.rows.length}${r.finished ? "" : " (incomplete)"}</option>`).join("") || "<option value=''>(no saved runs yet)</option>";
+    if (selectId) sel.value = selectId; showRun();
+  };
+  function selectedRun() { return loadRuns().find((r) => r.id === byId("run-select").value) || null; }
+  window.showRun = function () { const run = selectedRun(); byId("report").innerHTML = run ? reportHtml(run) : '<p class="text-sm text-gray-700">Run some questions and the report appears here.</p>'; };
+  window.deleteRun = function () { const run = selectedRun(); if (!run || !confirm(`Delete run ${run.id} from this browser?`)) return; storeRuns(loadRuns().filter((r) => r.id !== run.id)); refreshRuns(); };
+  function download(name, text, type) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
+  window.exportMd = function () { const run = selectedRun(); if (run) download(`report-${run.id}.md`, reportMarkdown(run), "text/markdown"); };
+  window.exportJson = function () { const run = selectedRun(); if (run) download(`run-${run.id}.json`, JSON.stringify(run, null, 2), "application/json"); };
+  window.exportCsv = function () { const run = selectedRun(); if (!run) return; const cols = ["question_id", "variant", "repeat", "category", "question", "expected_response", "final_answer", "correct", "score", "failure_mode", "scoring_detail", "refused", "latency_s", "completion_tokens", "tokens_per_s", "done_reason", "error"]; const esc = (v) => `"${String(v ?? "").replace(/"/g, '""').replace(/\n/g, " ")}"`; download(`results-${run.id}.csv`, [cols.join(",")].concat(run.rows.map((r) => cols.map((c) => esc(r[c])).join(","))).join("\n"), "text/csv"); };
+  window.saveToServer = async function (quiet) {
+    const run = quiet === true ? current : selectedRun(); const c = readConfig(); if (!run) return; if (!c.server) { byId("export-status").innerHTML = '<span class="warn">Enter the Go server address in settings first.</span>'; return; }
+    try { const j = await fetchJson(c.server + "/api/runs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(run) }, 10000); byId("export-status").innerHTML = `<span class="ok">Saved on server as ${escapeHtml(j.id)}. <a class="underline" target="_blank" href="${c.server}/api/runs/${encodeURIComponent(j.id)}/report.md">report.md</a> · <a class="underline" target="_blank" href="${c.server}/api/runs/${encodeURIComponent(j.id)}/report.pdf">report.pdf</a> · <a class="underline" target="_blank" href="${c.server}/api/runs/${encodeURIComponent(j.id)}/report.html">printable</a></span>`; }
+    catch (e) { byId("export-status").innerHTML = `<span class="bad">Server save failed: ${escapeHtml(classify(e))}</span>`; }
+  };
+  window.serverPdf = async function () { const run = selectedRun(); const c = readConfig(); if (!run) return; if (!c.server) { byId("export-status").innerHTML = '<span class="warn">Enter the Go server address in settings first.</span>'; return; } await saveToServer(); window.open(`${c.server}/api/runs/${encodeURIComponent(run.id)}/report.pdf`, "_blank"); };
+  refreshRuns();
+})();
+</script>
+</body>
+</html>

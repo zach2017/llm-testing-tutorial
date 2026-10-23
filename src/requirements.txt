@@ -1,0 +1,2 @@
+# Optional: charts in the report. Everything else is standard library only (Python 3.9+).
+matplotlib>=3.5

@@ -1,0 +1,1258 @@
+{
+  "models": [
+    "mock-medium",
+    "mock-strong",
+    "mock-weak"
+  ],
+  "variants": [
+    "baseline",
+    "cot",
+    "distractor",
+    "few_shot",
+    "no_context",
+    "persona",
+    "question_first",
+    "strict_grounded"
+  ],
+  "categories": [
+    "arithmetic",
+    "comparison",
+    "counting",
+    "factual",
+    "false_premise",
+    "instruction_following",
+    "negation",
+    "temporal",
+    "unanswerable"
+  ],
+  "n_rows": 2448,
+  "n_errors": 0,
+  "n_scored_rows": 2142,
+  "baseline_variant": "baseline",
+  "control_variants": [
+    "no_context"
+  ],
+  "repeats": 2,
+  "temperatures": [
+    0.7
+  ],
+  "headline": {
+    "mock-medium": {
+      "n": 714,
+      "correct": 376,
+      "accuracy": 0.5266106442577031,
+      "ci_low": 0.48994248650060945,
+      "ci_high": 0.5629939830492188,
+      "mean_score": 0.5299719887955182,
+      "hallucination_rate": 0.4166666666666667,
+      "over_refusal_rate": 0.0875,
+      "premise_acceptance_rate": 0.5857142857142857,
+      "format_compliance": 0.5,
+      "median_latency_s": 0.2091564976301685,
+      "mean_tokens_per_s": 90.19823859915711,
+      "mean_answer_words": 10.208683473389355,
+      "errors": 0,
+      "judge_accuracy": null,
+      "judge_n": 0,
+      "judge_agreement_with_heuristic": null,
+      "consistency": 0.6092436974789915,
+      "flip_rate": 0.47058823529411764,
+      "paraphrase_consistency": 0.46825396825396826,
+      "paraphrase_groups": 126
+    },
+    "mock-strong": {
+      "n": 714,
+      "correct": 542,
+      "accuracy": 0.7591036414565826,
+      "ci_low": 0.7264033774626835,
+      "ci_high": 0.7890306681540653,
+      "mean_score": 0.7624649859943977,
+      "hallucination_rate": 0.21428571428571427,
+      "over_refusal_rate": 0.05178571428571429,
+      "premise_acceptance_rate": 0.21428571428571427,
+      "format_compliance": 0.7619047619047619,
+      "median_latency_s": 0.2767356291121674,
+      "mean_tokens_per_s": 55.00238972848519,
+      "mean_answer_words": 10.57703081232493,
+      "errors": 0,
+      "judge_accuracy": null,
+      "judge_n": 0,
+      "judge_agreement_with_heuristic": null,
+      "consistency": 0.6288515406162465,
+      "flip_rate": 0.33613445378151263,
+      "paraphrase_consistency": 0.626984126984127,
+      "paraphrase_groups": 126
+    },
+    "mock-weak": {
+      "n": 714,
+      "correct": 193,
+      "accuracy": 0.2703081232492997,
+      "ci_low": 0.23902474369906904,
+      "ci_high": 0.3040499401866238,
+      "mean_score": 0.27703081232493,
+      "hallucination_rate": 0.8095238095238095,
+      "over_refusal_rate": 0.14821428571428572,
+      "premise_acceptance_rate": 0.8714285714285714,
+      "format_compliance": 0.35714285714285715,
+      "median_latency_s": 0.16364661799285213,
+      "mean_tokens_per_s": 139.93440186810741,
+      "mean_answer_words": 9.550420168067227,
+      "errors": 0,
+      "judge_accuracy": null,
+      "judge_n": 0,
+      "judge_agreement_with_heuristic": null,
+      "consistency": 0.6358543417366946,
+      "flip_rate": 0.3557422969187675,
+      "paraphrase_consistency": 0.626984126984127,
+      "paraphrase_groups": 126
+    }
+  },
+  "by_category": {
+    "mock-medium": {
+      "arithmetic": {
+        "n": 154,
+        "correct": 69,
+        "accuracy": 0.44805194805194803,
+        "ci_low": 0.371724394774724,
+        "ci_high": 0.5269081583671599,
+        "mean_score": 0.44805194805194803
+      },
+      "comparison": {
+        "n": 42,
+        "correct": 23,
+        "accuracy": 0.5476190476190477,
+        "ci_low": 0.39948862747122693,
+        "ci_high": 0.6877683618136149,
+        "mean_score": 0.5476190476190477
+      },
+      "counting": {
+        "n": 28,
+        "correct": 15,
+        "accuracy": 0.5357142857142857,
+        "ci_low": 0.3581239514210167,
+        "ci_high": 0.7046869626034041,
+        "mean_score": 0.5357142857142857
+      },
+      "factual": {
+        "n": 154,
+        "correct": 87,
+        "accuracy": 0.564935064935065,
+        "ci_low": 0.48599539739112657,
+        "ci_high": 0.6407139111815183,
+        "mean_score": 0.564935064935065
+      },
+      "false_premise": {
+        "n": 70,
+        "correct": 29,
+        "accuracy": 0.4142857142857143,
+        "ci_low": 0.3062999792481417,
+        "ci_high": 0.5311899993005356,
+        "mean_score": 0.4142857142857143
+      },
+      "instruction_following": {
+        "n": 42,
+        "correct": 21,
+        "accuracy": 0.5,
+        "ci_low": 0.3552574591652803,
+        "ci_high": 0.6447425408347197,
+        "mean_score": 0.5
+      },
+      "negation": {
+        "n": 56,
+        "correct": 34,
+        "accuracy": 0.6071428571428571,
+        "ci_low": 0.476331653784818,
+        "ci_high": 0.7241977438248716,
+        "mean_score": 0.6071428571428571
+      },
+      "temporal": {
+        "n": 84,
+        "correct": 49,
+        "accuracy": 0.5833333333333334,
+        "ci_low": 0.4765244867612664,
+        "ci_high": 0.6828533023500432,
+        "mean_score": 0.6119047619047618
+      },
+      "unanswerable": {
+        "n": 84,
+        "correct": 49,
+        "accuracy": 0.5833333333333334,
+        "ci_low": 0.4765244867612664,
+        "ci_high": 0.6828533023500432,
+        "mean_score": 0.5833333333333334
+      }
+    },
+    "mock-strong": {
+      "arithmetic": {
+        "n": 154,
+        "correct": 97,
+        "accuracy": 0.6298701298701299,
+        "ci_low": 0.5513165004505675,
+        "ci_high": 0.7021021166947227,
+        "mean_score": 0.6298701298701299
+      },
+      "comparison": {
+        "n": 42,
+        "correct": 30,
+        "accuracy": 0.7142857142857143,
+        "ci_low": 0.5643250392275445,
+        "ci_high": 0.8283314125542434,
+        "mean_score": 0.7142857142857143
+      },
+      "counting": {
+        "n": 28,
+        "correct": 24,
+        "accuracy": 0.8571428571428571,
+        "ci_low": 0.6850982695512267,
+        "ci_high": 0.9430108706929821,
+        "mean_score": 0.8571428571428571
+      },
+      "factual": {
+        "n": 154,
+        "correct": 132,
+        "accuracy": 0.8571428571428571,
+        "ci_low": 0.7931716849037994,
+        "ci_high": 0.9037295122457479,
+        "mean_score": 0.8571428571428571
+      },
+      "false_premise": {
+        "n": 70,
+        "correct": 55,
+        "accuracy": 0.7857142857142857,
+        "ci_low": 0.6760859281841939,
+        "ci_high": 0.8656141433202155,
+        "mean_score": 0.7857142857142857
+      },
+      "instruction_following": {
+        "n": 42,
+        "correct": 32,
+        "accuracy": 0.7619047619047619,
+        "ci_low": 0.6147216491768113,
+        "ci_high": 0.8651917918898182,
+        "mean_score": 0.7619047619047619
+      },
+      "negation": {
+        "n": 56,
+        "correct": 41,
+        "accuracy": 0.7321428571428571,
+        "ci_low": 0.6040519481066103,
+        "ci_high": 0.8304284133810503,
+        "mean_score": 0.7321428571428571
+      },
+      "temporal": {
+        "n": 84,
+        "correct": 65,
+        "accuracy": 0.7738095238095238,
+        "ci_low": 0.6735289274916636,
+        "ci_high": 0.8501409510169247,
+        "mean_score": 0.8023809523809524
+      },
+      "unanswerable": {
+        "n": 84,
+        "correct": 66,
+        "accuracy": 0.7857142857142857,
+        "ci_low": 0.6865046833134146,
+        "ci_high": 0.8599334507825035,
+        "mean_score": 0.7857142857142857
+      }
+    },
+    "mock-weak": {
+      "arithmetic": {
+        "n": 154,
+        "correct": 34,
+        "accuracy": 0.22077922077922077,
+        "ci_low": 0.16251159892911632,
+        "ci_high": 0.29263837420851024,
+        "mean_score": 0.22077922077922077
+      },
+      "comparison": {
+        "n": 42,
+        "correct": 15,
+        "accuracy": 0.35714285714285715,
+        "ci_low": 0.22988992501626865,
+        "ci_high": 0.5083391071292063,
+        "mean_score": 0.35714285714285715
+      },
+      "counting": {
+        "n": 28,
+        "correct": 8,
+        "accuracy": 0.2857142857142857,
+        "ci_low": 0.15253815848329969,
+        "ci_high": 0.470596357370175,
+        "mean_score": 0.2857142857142857
+      },
+      "factual": {
+        "n": 154,
+        "correct": 53,
+        "accuracy": 0.34415584415584416,
+        "ci_low": 0.2737339181058115,
+        "ci_high": 0.42216374131984047,
+        "mean_score": 0.34415584415584416
+      },
+      "false_premise": {
+        "n": 70,
+        "correct": 9,
+        "accuracy": 0.12857142857142856,
+        "ci_low": 0.06914021991242263,
+        "ci_high": 0.22664968713184502,
+        "mean_score": 0.12857142857142856
+      },
+      "instruction_following": {
+        "n": 42,
+        "correct": 15,
+        "accuracy": 0.35714285714285715,
+        "ci_low": 0.22988992501626865,
+        "ci_high": 0.5083391071292063,
+        "mean_score": 0.35714285714285715
+      },
+      "negation": {
+        "n": 56,
+        "correct": 16,
+        "accuracy": 0.2857142857142857,
+        "ci_low": 0.18418621391703333,
+        "ci_high": 0.4147549908635875,
+        "mean_score": 0.2857142857142857
+      },
+      "temporal": {
+        "n": 84,
+        "correct": 27,
+        "accuracy": 0.32142857142857145,
+        "ci_low": 0.23125977350162447,
+        "ci_high": 0.42721639268842665,
+        "mean_score": 0.37857142857142856
+      },
+      "unanswerable": {
+        "n": 84,
+        "correct": 16,
+        "accuracy": 0.19047619047619047,
+        "ci_low": 0.12078595196346183,
+        "ci_high": 0.2872394027659602,
+        "mean_score": 0.19047619047619047
+      }
+    }
+  },
+  "by_position": {
+    "mock-medium": {
+      "start": {
+        "n": 210,
+        "correct": 110,
+        "accuracy": 0.5238095238095238,
+        "ci_low": 0.4564402238793895,
+        "ci_high": 0.5903233618775447,
+        "mean_score": 0.5352380952380953
+      },
+      "middle": {
+        "n": 294,
+        "correct": 156,
+        "accuracy": 0.5306122448979592,
+        "ci_low": 0.4735375866724079,
+        "ci_high": 0.5868972216283803,
+        "mean_score": 0.5306122448979592
+      },
+      "end": {
+        "n": 126,
+        "correct": 61,
+        "accuracy": 0.48412698412698413,
+        "ci_low": 0.3986345839535585,
+        "ci_high": 0.5705586484157286,
+        "mean_score": 0.48412698412698413
+      }
+    },
+    "mock-strong": {
+      "start": {
+        "n": 210,
+        "correct": 161,
+        "accuracy": 0.7666666666666667,
+        "ci_low": 0.7049846504771438,
+        "ci_high": 0.8187675100005183,
+        "mean_score": 0.7780952380952382
+      },
+      "middle": {
+        "n": 294,
+        "correct": 220,
+        "accuracy": 0.7482993197278912,
+        "ci_low": 0.695704550090283,
+        "ci_high": 0.7944888950161093,
+        "mean_score": 0.7482993197278912
+      },
+      "end": {
+        "n": 126,
+        "correct": 95,
+        "accuracy": 0.753968253968254,
+        "ci_low": 0.6719905884707239,
+        "ci_high": 0.820917693620686,
+        "mean_score": 0.753968253968254
+      }
+    },
+    "mock-weak": {
+      "start": {
+        "n": 210,
+        "correct": 55,
+        "accuracy": 0.2619047619047619,
+        "ci_low": 0.207096851639469,
+        "ci_high": 0.3252672907911901,
+        "mean_score": 0.28476190476190477
+      },
+      "middle": {
+        "n": 294,
+        "correct": 83,
+        "accuracy": 0.282312925170068,
+        "ci_low": 0.23392298648814763,
+        "ci_high": 0.33631837670624837,
+        "mean_score": 0.282312925170068
+      },
+      "end": {
+        "n": 126,
+        "correct": 39,
+        "accuracy": 0.30952380952380953,
+        "ci_low": 0.23544101478078405,
+        "ci_high": 0.3948777736506587,
+        "mean_score": 0.30952380952380953
+      }
+    }
+  },
+  "by_difficulty": {
+    "mock-medium": {
+      "1": {
+        "n": 252,
+        "correct": 143,
+        "accuracy": 0.5674603174603174,
+        "ci_low": 0.505730174407499,
+        "ci_high": 0.6271645542058305,
+        "mean_score": 0.5674603174603174
+      },
+      "2": {
+        "n": 364,
+        "correct": 190,
+        "accuracy": 0.521978021978022,
+        "ci_low": 0.47070033313477605,
+        "ci_high": 0.5727966503494193,
+        "mean_score": 0.5285714285714286
+      },
+      "3": {
+        "n": 98,
+        "correct": 43,
+        "accuracy": 0.4387755102040816,
+        "ci_low": 0.3446781918182551,
+        "ci_high": 0.53749176623425,
+        "mean_score": 0.4387755102040816
+      }
+    },
+    "mock-strong": {
+      "1": {
+        "n": 252,
+        "correct": 210,
+        "accuracy": 0.8333333333333334,
+        "ci_low": 0.7823874998423984,
+        "ci_high": 0.8742688062469944,
+        "mean_score": 0.8333333333333334
+      },
+      "2": {
+        "n": 364,
+        "correct": 262,
+        "accuracy": 0.7197802197802198,
+        "ci_low": 0.6715315411621784,
+        "ci_high": 0.7634382936797753,
+        "mean_score": 0.7263736263736263
+      },
+      "3": {
+        "n": 98,
+        "correct": 70,
+        "accuracy": 0.7142857142857143,
+        "ci_low": 0.6180914698303978,
+        "ci_high": 0.7943136769858347,
+        "mean_score": 0.7142857142857143
+      }
+    },
+    "mock-weak": {
+      "1": {
+        "n": 252,
+        "correct": 86,
+        "accuracy": 0.3412698412698413,
+        "ci_low": 0.2855047832785992,
+        "ci_high": 0.40180173763121374,
+        "mean_score": 0.3412698412698413
+      },
+      "2": {
+        "n": 364,
+        "correct": 94,
+        "accuracy": 0.25824175824175827,
+        "ci_low": 0.21596835287681238,
+        "ci_high": 0.3055648287970386,
+        "mean_score": 0.2714285714285714
+      },
+      "3": {
+        "n": 98,
+        "correct": 13,
+        "accuracy": 0.1326530612244898,
+        "ci_low": 0.07918911601863514,
+        "ci_high": 0.21383063229639532,
+        "mean_score": 0.1326530612244898
+      }
+    }
+  },
+  "by_variant": {
+    "mock-medium": {
+      "baseline": {
+        "n": 102,
+        "correct": 57,
+        "accuracy": 0.5588235294117647,
+        "ci_low": 0.4620686963178269,
+        "ci_high": 0.6513082745518501,
+        "mean_score": 0.5588235294117647,
+        "refusal_rate": 0.13725490196078433,
+        "mean_answer_words": 6.205882352941177,
+        "delta_vs_baseline": null
+      },
+      "cot": {
+        "n": 102,
+        "correct": 58,
+        "accuracy": 0.5686274509803921,
+        "ci_low": 0.47174801648043707,
+        "ci_high": 0.6605251162008527,
+        "mean_score": 0.5764705882352941,
+        "refusal_rate": 0.09803921568627451,
+        "mean_answer_words": 33.76470588235294,
+        "delta_vs_baseline": 0.009803921568627416
+      },
+      "distractor": {
+        "n": 102,
+        "correct": 52,
+        "accuracy": 0.5098039215686274,
+        "ci_low": 0.4142085151226479,
+        "ci_high": 0.6046876466889649,
+        "mean_score": 0.5098039215686274,
+        "refusal_rate": 0.10784313725490197,
+        "mean_answer_words": 6.323529411764706,
+        "delta_vs_baseline": -0.0490196078431373
+      },
+      "few_shot": {
+        "n": 102,
+        "correct": 61,
+        "accuracy": 0.5980392156862745,
+        "ci_low": 0.5010049524706779,
+        "ci_high": 0.6879566656454503,
+        "mean_score": 0.5980392156862745,
+        "refusal_rate": 0.1568627450980392,
+        "mean_answer_words": 5.284313725490196,
+        "delta_vs_baseline": 0.039215686274509776
+      },
+      "no_context": {
+        "n": 102,
+        "correct": 8,
+        "accuracy": 0.0784313725490196,
+        "ci_low": 0.04027620360068292,
+        "ci_high": 0.1471888384999656,
+        "mean_score": 0.0784313725490196,
+        "refusal_rate": 0.6470588235294118,
+        "mean_answer_words": 8.607843137254902,
+        "delta_vs_baseline": -0.4803921568627451
+      },
+      "persona": {
+        "n": 102,
+        "correct": 50,
+        "accuracy": 0.49019607843137253,
+        "ci_low": 0.39531235331103515,
+        "ci_high": 0.5857914848773521,
+        "mean_score": 0.49019607843137253,
+        "refusal_rate": 0.0784313725490196,
+        "mean_answer_words": 8.686274509803921,
+        "delta_vs_baseline": -0.06862745098039219
+      },
+      "question_first": {
+        "n": 102,
+        "correct": 49,
+        "accuracy": 0.4803921568627451,
+        "ci_low": 0.3859172379946161,
+        "ci_high": 0.5762904383821584,
+        "mean_score": 0.4803921568627451,
+        "refusal_rate": 0.11764705882352941,
+        "mean_answer_words": 6.372549019607843,
+        "delta_vs_baseline": -0.0784313725490196
+      },
+      "strict_grounded": {
+        "n": 102,
+        "correct": 49,
+        "accuracy": 0.4803921568627451,
+        "ci_low": 0.3859172379946161,
+        "ci_high": 0.5762904383821584,
+        "mean_score": 0.49607843137254903,
+        "refusal_rate": 0.2647058823529412,
+        "mean_answer_words": 4.823529411764706,
+        "delta_vs_baseline": -0.0784313725490196
+      }
+    },
+    "mock-strong": {
+      "baseline": {
+        "n": 102,
+        "correct": 82,
+        "accuracy": 0.803921568627451,
+        "ci_low": 0.7164507018692817,
+        "ci_high": 0.8693303142907159,
+        "mean_score": 0.803921568627451,
+        "refusal_rate": 0.09803921568627451,
+        "mean_answer_words": 7.313725490196078,
+        "delta_vs_baseline": null
+      },
+      "cot": {
+        "n": 102,
+        "correct": 92,
+        "accuracy": 0.9019607843137255,
+        "ci_low": 0.8288700711192171,
+        "ci_high": 0.9458725631569088,
+        "mean_score": 0.9019607843137255,
+        "refusal_rate": 0.13725490196078433,
+        "mean_answer_words": 34.26470588235294,
+        "delta_vs_baseline": 0.0980392156862745
+      },
+      "distractor": {
+        "n": 102,
+        "correct": 66,
+        "accuracy": 0.6470588235294118,
+        "ci_low": 0.5505209704774588,
+        "ci_high": 0.7329214566967336,
+        "mean_score": 0.6470588235294118,
+        "refusal_rate": 0.08823529411764706,
+        "mean_answer_words": 5.784313725490196,
+        "delta_vs_baseline": -0.1568627450980392
+      },
+      "few_shot": {
+        "n": 102,
+        "correct": 85,
+        "accuracy": 0.8333333333333334,
+        "ci_low": 0.7492107842584269,
+        "ci_high": 0.8932587173364094,
+        "mean_score": 0.8411764705882353,
+        "refusal_rate": 0.13725490196078433,
+        "mean_answer_words": 6.019607843137255,
+        "delta_vs_baseline": 0.02941176470588236
+      },
+      "no_context": {
+        "n": 102,
+        "correct": 15,
+        "accuracy": 0.14705882352941177,
+        "ci_low": 0.09119034130498939,
+        "ci_high": 0.2285478334769489,
+        "mean_score": 0.14705882352941177,
+        "refusal_rate": 0.5392156862745098,
+        "mean_answer_words": 8.362745098039216,
+        "delta_vs_baseline": -0.6568627450980392
+      },
+      "persona": {
+        "n": 102,
+        "correct": 70,
+        "accuracy": 0.6862745098039216,
+        "ci_low": 0.5908554817574903,
+        "ci_high": 0.7681715926631534,
+        "mean_score": 0.6941176470588235,
+        "refusal_rate": 0.06862745098039216,
+        "mean_answer_words": 8.519607843137255,
+        "delta_vs_baseline": -0.11764705882352944
+      },
+      "question_first": {
+        "n": 102,
+        "correct": 79,
+        "accuracy": 0.7745098039215687,
+        "ci_low": 0.6843083691640883,
+        "ci_high": 0.844784161561071,
+        "mean_score": 0.7823529411764706,
+        "refusal_rate": 0.12745098039215685,
+        "mean_answer_words": 6.480392156862745,
+        "delta_vs_baseline": -0.02941176470588236
+      },
+      "strict_grounded": {
+        "n": 102,
+        "correct": 68,
+        "accuracy": 0.6666666666666666,
+        "ci_low": 0.5706045117876962,
+        "ci_high": 0.7506302390097218,
+        "mean_score": 0.6666666666666666,
+        "refusal_rate": 0.27450980392156865,
+        "mean_answer_words": 5.6568627450980395,
+        "delta_vs_baseline": -0.13725490196078438
+      }
+    },
+    "mock-weak": {
+      "baseline": {
+        "n": 102,
+        "correct": 39,
+        "accuracy": 0.38235294117647056,
+        "ci_low": 0.2939418160157895,
+        "ci_high": 0.4793042422448567,
+        "mean_score": 0.3901960784313725,
+        "refusal_rate": 0.1568627450980392,
+        "mean_answer_words": 5.735294117647059,
+        "delta_vs_baseline": null
+      },
+      "cot": {
+        "n": 102,
+        "correct": 46,
+        "accuracy": 0.45098039215686275,
+        "ci_low": 0.35794458285356257,
+        "ci_high": 0.5475746080883734,
+        "mean_score": 0.45098039215686275,
+        "refusal_rate": 0.11764705882352941,
+        "mean_answer_words": 33.64705882352941,
+        "delta_vs_baseline": 0.06862745098039219
+      },
+      "distractor": {
+        "n": 102,
+        "correct": 13,
+        "accuracy": 0.12745098039215685,
+        "ci_low": 0.07601761416527755,
+        "ci_high": 0.20592823699343513,
+        "mean_score": 0.14313725490196078,
+        "refusal_rate": 0.11764705882352941,
+        "mean_answer_words": 5.637254901960785,
+        "delta_vs_baseline": -0.2549019607843137
+      },
+      "few_shot": {
+        "n": 102,
+        "correct": 29,
+        "accuracy": 0.28431372549019607,
+        "ci_low": 0.2058478204977063,
+        "ci_high": 0.3784366196468115,
+        "mean_score": 0.29215686274509806,
+        "refusal_rate": 0.11764705882352941,
+        "mean_answer_words": 4.1568627450980395,
+        "delta_vs_baseline": -0.0980392156862745
+      },
+      "no_context": {
+        "n": 102,
+        "correct": 2,
+        "accuracy": 0.0196078431372549,
+        "ci_low": 0.005393639125345434,
+        "ci_high": 0.06869443210562613,
+        "mean_score": 0.0196078431372549,
+        "refusal_rate": 0.5882352941176471,
+        "mean_answer_words": 7.480392156862745,
+        "delta_vs_baseline": -0.3627450980392157
+      },
+      "persona": {
+        "n": 102,
+        "correct": 21,
+        "accuracy": 0.20588235294117646,
+        "ci_low": 0.13878787006683843,
+        "ci_high": 0.2943272755847769,
+        "mean_score": 0.21372549019607845,
+        "refusal_rate": 0.09803921568627451,
+        "mean_answer_words": 7.450980392156863,
+        "delta_vs_baseline": -0.1764705882352941
+      },
+      "question_first": {
+        "n": 102,
+        "correct": 23,
+        "accuracy": 0.22549019607843138,
+        "ci_low": 0.15521583843892917,
+        "ci_high": 0.31569163083591173,
+        "mean_score": 0.22549019607843138,
+        "refusal_rate": 0.08823529411764706,
+        "mean_answer_words": 5.372549019607843,
+        "delta_vs_baseline": -0.15686274509803919
+      },
+      "strict_grounded": {
+        "n": 102,
+        "correct": 22,
+        "accuracy": 0.21568627450980393,
+        "ci_low": 0.14697094402656707,
+        "ci_high": 0.3050403634366611,
+        "mean_score": 0.2235294117647059,
+        "refusal_rate": 0.29411764705882354,
+        "mean_answer_words": 4.852941176470588,
+        "delta_vs_baseline": -0.16666666666666663
+      }
+    }
+  },
+  "control": {
+    "mock-medium": {
+      "n": 102,
+      "guess_accuracy": 0.0,
+      "abstention_rate": 0.6470588235294118
+    },
+    "mock-strong": {
+      "n": 102,
+      "guess_accuracy": 0.0,
+      "abstention_rate": 0.5392156862745098
+    },
+    "mock-weak": {
+      "n": 102,
+      "guess_accuracy": 0.00980392156862745,
+      "abstention_rate": 0.5882352941176471
+    }
+  },
+  "failure_modes": {
+    "mock-medium": {
+      "wrong_value": 117,
+      "wrong_entity": 75,
+      "partial": 3,
+      "no_answer": 0,
+      "hallucination": 35,
+      "over_refusal": 49,
+      "premise_accepted": 41,
+      "format_violation": 18,
+      "error": 0
+    },
+    "mock-strong": {
+      "wrong_value": 60,
+      "wrong_entity": 38,
+      "partial": 3,
+      "no_answer": 0,
+      "hallucination": 18,
+      "over_refusal": 29,
+      "premise_accepted": 15,
+      "format_violation": 9,
+      "error": 0
+    },
+    "mock-weak": {
+      "wrong_value": 163,
+      "wrong_entity": 121,
+      "partial": 6,
+      "no_answer": 0,
+      "hallucination": 68,
+      "over_refusal": 83,
+      "premise_accepted": 61,
+      "format_violation": 19,
+      "error": 0
+    }
+  },
+  "process": {
+    "mock-medium": {
+      "cot_n": 102,
+      "cot_marker_adherence": 1.0,
+      "cot_reasoning_words_correct": 28.0,
+      "cot_reasoning_words_incorrect": 28.0,
+      "answer_words_correct": 10.502659574468085,
+      "answer_words_incorrect": 9.881656804733728,
+      "thinking_rows": 0
+    },
+    "mock-strong": {
+      "cot_n": 102,
+      "cot_marker_adherence": 1.0,
+      "cot_reasoning_words_correct": 28.0,
+      "cot_reasoning_words_incorrect": 28.0,
+      "answer_words_correct": 11.52029520295203,
+      "answer_words_incorrect": 7.604651162790698,
+      "thinking_rows": 0
+    },
+    "mock-weak": {
+      "cot_n": 102,
+      "cot_marker_adherence": 1.0,
+      "cot_reasoning_words_correct": 28.0,
+      "cot_reasoning_words_incorrect": 28.0,
+      "answer_words_correct": 11.766839378238341,
+      "answer_words_incorrect": 8.72936660268714,
+      "thinking_rows": 0
+    }
+  },
+  "pairwise": [
+    {
+      "model_a": "mock-medium",
+      "model_b": "mock-strong",
+      "n_pairs": 714,
+      "acc_a": 0.5266106442577031,
+      "acc_b": 0.7591036414565826,
+      "diff": -0.22959183673469385,
+      "ci_low": -0.2797619047619049,
+      "ci_high": -0.17602040816326536,
+      "a_only_correct": 81,
+      "b_only_correct": 247,
+      "p_value": 1.1594876846961962e-20
+    },
+    {
+      "model_a": "mock-medium",
+      "model_b": "mock-weak",
+      "n_pairs": 714,
+      "acc_a": 0.5266106442577031,
+      "acc_b": 0.2703081232492997,
+      "diff": 0.25510204081632654,
+      "ci_low": 0.20748299319727903,
+      "ci_high": 0.3018707482993197,
+      "a_only_correct": 272,
+      "b_only_correct": 89,
+      "p_value": 1.1167820584725431e-22
+    },
+    {
+      "model_a": "mock-strong",
+      "model_b": "mock-weak",
+      "n_pairs": 714,
+      "acc_a": 0.7591036414565826,
+      "acc_b": 0.2703081232492997,
+      "diff": 0.48469387755102045,
+      "ci_low": 0.4345238095238096,
+      "ci_high": 0.5340136054421769,
+      "a_only_correct": 389,
+      "b_only_correct": 40,
+      "p_value": 5.992498231095609e-73
+    }
+  ],
+  "per_question": {
+    "Q01": {
+      "category": "factual",
+      "question": "Who founded Maple Street Market?",
+      "overall": 0.6428571428571429,
+      "mock-medium": 0.5714285714285714,
+      "mock-strong": 0.9285714285714286,
+      "mock-weak": 0.42857142857142855
+    },
+    "Q02": {
+      "category": "factual",
+      "question": "Who currently owns the store?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.5714285714285714,
+      "mock-strong": 0.7142857142857143,
+      "mock-weak": 0.14285714285714285
+    },
+    "Q03": {
+      "category": "factual",
+      "question": "How many people does the store employ?",
+      "overall": 0.6190476190476191,
+      "mock-medium": 0.5357142857142857,
+      "mock-strong": 0.9285714285714286,
+      "mock-weak": 0.39285714285714285
+    },
+    "Q04": {
+      "category": "factual",
+      "question": "Who is the store manager?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.6428571428571429,
+      "mock-strong": 0.5714285714285714,
+      "mock-weak": 0.21428571428571427
+    },
+    "Q05": {
+      "category": "factual",
+      "question": "How much does a gallon of whole milk cost?",
+      "overall": 0.6309523809523809,
+      "mock-medium": 0.7142857142857143,
+      "mock-strong": 0.8928571428571429,
+      "mock-weak": 0.2857142857142857
+    },
+    "Q06": {
+      "category": "factual",
+      "question": "What is the price of one blueberry muffin?",
+      "overall": 0.6428571428571429,
+      "mock-medium": 0.5,
+      "mock-strong": 0.8571428571428571,
+      "mock-weak": 0.5714285714285714
+    },
+    "Q07": {
+      "category": "factual",
+      "question": "What is the email address for contacting the manager?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.35714285714285715,
+      "mock-strong": 0.7857142857142857,
+      "mock-weak": 0.2857142857142857
+    },
+    "Q08": {
+      "category": "factual",
+      "question": "How many parking spaces does the store's lot have?",
+      "overall": 0.5952380952380952,
+      "mock-medium": 0.5,
+      "mock-strong": 0.9285714285714286,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q09": {
+      "category": "temporal",
+      "question": "What time does the store open on Sundays?",
+      "overall": 0.6666666666666666,
+      "mock-medium": 0.8571428571428571,
+      "mock-strong": 0.7857142857142857,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q10": {
+      "category": "temporal",
+      "question": "Is the store open at 8:00 PM on a Saturday?",
+      "overall": 0.5476190476190477,
+      "mock-medium": 0.4642857142857143,
+      "mock-strong": 0.7857142857142857,
+      "mock-weak": 0.39285714285714285
+    },
+    "Q11": {
+      "category": "temporal",
+      "question": "Is the store open at 8:00 PM on a Sunday?",
+      "overall": 0.5,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.9285714285714286,
+      "mock-weak": 0.14285714285714285
+    },
+    "Q12": {
+      "category": "temporal",
+      "question": "On which holidays is the store closed?",
+      "overall": 0.6190476190476191,
+      "mock-medium": 0.7142857142857143,
+      "mock-strong": 0.7857142857142857,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q13": {
+      "category": "temporal",
+      "question": "At what time does the bakery counter stop serving each day?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.5714285714285714,
+      "mock-strong": 0.5714285714285714,
+      "mock-weak": 0.2857142857142857
+    },
+    "Q14": {
+      "category": "factual",
+      "question": "In what year did the pharmacy counter close?",
+      "overall": 0.6666666666666666,
+      "mock-medium": 0.5714285714285714,
+      "mock-strong": 1.0,
+      "mock-weak": 0.42857142857142855
+    },
+    "Q15": {
+      "category": "arithmetic",
+      "question": "How much do 3 pounds of regular apples cost?",
+      "overall": 0.4880952380952381,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.8214285714285714,
+      "mock-weak": 0.21428571428571427
+    },
+    "Q16": {
+      "category": "arithmetic",
+      "question": "What is the total cost of 2 sourdough loaves and 1 dozen large eggs, before any discounts?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.6428571428571429,
+      "mock-strong": 0.6428571428571429,
+      "mock-weak": 0.14285714285714285
+    },
+    "Q17": {
+      "category": "arithmetic",
+      "question": "On a Tuesday, what does one sourdough loaf cost after the Tuesday bakery discount? Ignore the Rewards card.",
+      "overall": 0.40476190476190477,
+      "mock-medium": 0.2857142857142857,
+      "mock-strong": 0.5714285714285714,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q18": {
+      "category": "arithmetic",
+      "question": "A customer buys 3 cans of tomato soup. How much do they pay for the soup?",
+      "overall": 0.4523809523809524,
+      "mock-medium": 0.5357142857142857,
+      "mock-strong": 0.5714285714285714,
+      "mock-weak": 0.25
+    },
+    "Q19": {
+      "category": "arithmetic",
+      "question": "A Maple Rewards member buys groceries totaling $20.00 with no other discounts. How much do they pay after the Rewards discount?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.7142857142857143,
+      "mock-weak": 0.2857142857142857
+    },
+    "Q20": {
+      "category": "arithmetic",
+      "question": "A customer who lives 3 miles from the store orders $42.00 of groceries for delivery. What delivery fee do they pay?",
+      "overall": 0.39285714285714285,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.6071428571428571,
+      "mock-weak": 0.14285714285714285
+    },
+    "Q21": {
+      "category": "arithmetic",
+      "question": "A customer who lives 3 miles from the store orders $55.00 of groceries for delivery. What delivery fee do they pay?",
+      "overall": 0.42857142857142855,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.5,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q22": {
+      "category": "arithmetic",
+      "question": "For how many years did Helen Park own the store before Daniel Park took over?",
+      "overall": 0.30952380952380953,
+      "mock-medium": 0.35714285714285715,
+      "mock-strong": 0.5,
+      "mock-weak": 0.07142857142857142
+    },
+    "Q23": {
+      "category": "counting",
+      "question": "How many checkout stations does the store have in total, counting both regular lanes and self-checkout kiosks?",
+      "overall": 0.5714285714285714,
+      "mock-medium": 0.5,
+      "mock-strong": 0.8571428571428571,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q24": {
+      "category": "counting",
+      "question": "How many departments does the store have?",
+      "overall": 0.5476190476190477,
+      "mock-medium": 0.5714285714285714,
+      "mock-strong": 0.8571428571428571,
+      "mock-weak": 0.21428571428571427
+    },
+    "Q25": {
+      "category": "comparison",
+      "question": "Which costs more per pound: bananas or regular apples?",
+      "overall": 0.5238095238095238,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.8571428571428571,
+      "mock-weak": 0.2857142857142857
+    },
+    "Q26": {
+      "category": "comparison",
+      "question": "How many times more expensive are organic apples than regular apples?",
+      "overall": 0.5952380952380952,
+      "mock-medium": 0.6428571428571429,
+      "mock-strong": 0.6428571428571429,
+      "mock-weak": 0.5
+    },
+    "Q27": {
+      "category": "comparison",
+      "question": "Which is more expensive per pound: sliced turkey or sharp cheddar cheese?",
+      "overall": 0.5,
+      "mock-medium": 0.5714285714285714,
+      "mock-strong": 0.6428571428571429,
+      "mock-weak": 0.2857142857142857
+    },
+    "Q28": {
+      "category": "negation",
+      "question": "Does the store sell tobacco?",
+      "overall": 0.5476190476190477,
+      "mock-medium": 0.6071428571428571,
+      "mock-strong": 0.6785714285714286,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q29": {
+      "category": "negation",
+      "question": "Can a customer return a perishable item if they have a receipt?",
+      "overall": 0.6190476190476191,
+      "mock-medium": 0.6428571428571429,
+      "mock-strong": 0.8571428571428571,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q30": {
+      "category": "negation",
+      "question": "Which one of the following does the store NOT sell: bananas, eggs, beer, or turkey?",
+      "overall": 0.4523809523809524,
+      "mock-medium": 0.5714285714285714,
+      "mock-strong": 0.7142857142857143,
+      "mock-weak": 0.07142857142857142
+    },
+    "Q31": {
+      "category": "unanswerable",
+      "question": "What is the store's phone number?",
+      "overall": 0.5952380952380952,
+      "mock-medium": 0.7142857142857143,
+      "mock-strong": 0.8928571428571429,
+      "mock-weak": 0.17857142857142858
+    },
+    "Q32": {
+      "category": "unanswerable",
+      "question": "How much does a loaf of rye bread cost?",
+      "overall": 0.5238095238095238,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.8571428571428571,
+      "mock-weak": 0.2857142857142857
+    },
+    "Q33": {
+      "category": "unanswerable",
+      "question": "Who is the assistant manager?",
+      "overall": 0.42857142857142855,
+      "mock-medium": 0.35714285714285715,
+      "mock-strong": 0.7857142857142857,
+      "mock-weak": 0.14285714285714285
+    },
+    "Q34": {
+      "category": "unanswerable",
+      "question": "How many employees work in the deli department?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.6428571428571429,
+      "mock-strong": 0.5714285714285714,
+      "mock-weak": 0.21428571428571427
+    },
+    "Q35": {
+      "category": "unanswerable",
+      "question": "What is the store's annual revenue?",
+      "overall": 0.5,
+      "mock-medium": 0.6428571428571429,
+      "mock-strong": 0.7142857142857143,
+      "mock-weak": 0.14285714285714285
+    },
+    "Q36": {
+      "category": "false_premise",
+      "question": "Why does the store close at noon on Sundays?",
+      "overall": 0.42857142857142855,
+      "mock-medium": 0.32142857142857145,
+      "mock-strong": 0.7857142857142857,
+      "mock-weak": 0.17857142857142858
+    },
+    "Q37": {
+      "category": "false_premise",
+      "question": "What discount does the store offer on wine on Fridays?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.5,
+      "mock-strong": 0.7857142857142857,
+      "mock-weak": 0.14285714285714285
+    },
+    "Q38": {
+      "category": "false_premise",
+      "question": "What are the pharmacy counter's opening hours?",
+      "overall": 0.47619047619047616,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.8571428571428571,
+      "mock-weak": 0.14285714285714285
+    },
+    "Q39": {
+      "category": "false_premise",
+      "question": "Why did Rosa Delgado decide to found the store in 1998?",
+      "overall": 0.40476190476190477,
+      "mock-medium": 0.5,
+      "mock-strong": 0.7142857142857143,
+      "mock-weak": 0.0
+    },
+    "Q40": {
+      "category": "instruction_following",
+      "question": "Answer with only a number and nothing else: how many self-checkout kiosks does the store have?",
+      "overall": 0.6428571428571429,
+      "mock-medium": 0.5714285714285714,
+      "mock-strong": 0.9285714285714286,
+      "mock-weak": 0.42857142857142855
+    },
+    "Q41": {
+      "category": "instruction_following",
+      "question": "Reply with exactly one word, YES or NO: does the store offer home delivery?",
+      "overall": 0.5238095238095238,
+      "mock-medium": 0.5,
+      "mock-strong": 0.7142857142857143,
+      "mock-weak": 0.35714285714285715
+    },
+    "Q42": {
+      "category": "instruction_following",
+      "question": "List the store's five departments, separated by commas, with no other words.",
+      "overall": 0.4523809523809524,
+      "mock-medium": 0.42857142857142855,
+      "mock-strong": 0.6428571428571429,
+      "mock-weak": 0.2857142857142857
+    }
+  },
+  "meta": {
+    "title": "Grocery-Store Reading Comprehension Benchmark",
+    "generated_at": "2026-10-21T06:31:45",
+    "document": "grocery_store.txt",
+    "document_sha256": "0d304fededf1132c5d9cf1cdb1b225b8641ed36d303c120a28443bc81bd829cb",
+    "backend": "mock",
+    "ollama_version": null,
+    "run_id": "20261021-063144-e2da2e",
+    "config": {
+      "models": [
+        "mock-strong",
+        "mock-medium",
+        "mock-weak"
+      ],
+      "variants": [
+        "baseline",
+        "strict_grounded",
+        "cot",
+        "few_shot",
+        "persona",
+        "question_first",
+        "distractor",
+        "no_context"
+      ],
+      "repeats": 2,
+      "temperature": 0.7,
+      "seed": 42,
+      "num_predict": 400,
+      "paraphrases": true,
+      "judge_model": null
+    }
+  }
+}
