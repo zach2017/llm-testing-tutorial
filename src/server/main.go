@@ -35,6 +35,7 @@ var (
 	ollamaURL = flag.String("ollama", envOr("OLLAMA_HOST", "http://localhost:11434"), "Ollama base URL")
 	webDir    = flag.String("web", "../web", "folder with index.html / lab.html")
 	dataDir   = flag.String("data", "./data", "folder where runs are saved")
+	activate  = flag.String("activate", "", "activate a license key (GLE1-...) and exit")
 	safeID    = regexp.MustCompile(`^[A-Za-z0-9_.-]{1,80}$`)
 )
 
@@ -273,6 +274,9 @@ func runMarkdown(run *Run) string {
 		status = " (incomplete)"
 	}
 	w("# Grocery-Store Benchmark — %s\n", run.Model)
+	if wm := trialWatermark(); wm != "" {
+		w("> %s", strings.TrimSpace(wm))
+	}
 	w("Run %s, started %s%s. Settings: max tokens %s, temperature %s, thinking %s, repeats %s. Connection: %s. Prompt styles: %s.\n",
 		run.ID, run.StartedAt, status, settingStr(run, "num_predict"), settingStr(run, "temperature"), settingStr(run, "think"), settingStr(run, "repeats"), run.Route, strings.Join(run.Variants, ", "))
 	w("## Headline\n\n| Metric | Value |\n|---|---|")
@@ -316,7 +320,7 @@ var htmlTmpl = template.Must(template.New("r").Funcs(template.FuncMap{"pct": pct
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Report {{.Run.Model}} {{.Run.ID}}</title>
 <style>body{font-family:"IBM Plex Sans",system-ui,sans-serif;color:#161616;background:#fff;max-width:960px;margin:2em auto;padding:0 1em;line-height:1.5}h1,h2{color:#002d9c}table{border-collapse:collapse;width:100%;font-size:.9em;margin:.5em 0 1.5em}th,td{border:1px solid #e0e0e0;padding:.35em .5em;text-align:left;vertical-align:top}th{background:#f4f4f4}.ok{color:#198038}.bad{color:#da1e28}.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6em}.tile{border:1px solid #e0e0e0;border-top:4px solid #0f62fe;padding:.6em;text-align:center}.tile b{font-size:1.4em;color:#002d9c;display:block}@media print{button{display:none}}</style></head>
 <body><button onclick="window.print()">Print / save as PDF</button>
-<h1>Grocery-Store Benchmark — {{.Run.Model}}</h1>
+<h1>Grocery-Store Benchmark — {{.Run.Model}}</h1>{{if .Watermark}}<p style="color:#da1e28"><b>{{.Watermark}}</b></p>{{end}}
 <p>Run {{.Run.ID}}, started {{.Run.StartedAt}}{{if not .Run.Finished}} (incomplete){{end}}. Prompt styles: {{range $i,$v := .Run.Variants}}{{if $i}}, {{end}}{{$v}}{{end}}. Connection: {{.Run.Route}}.</p>
 <div class="tiles"><div class="tile"><b>{{pct .S.Acc}}</b>Accuracy ({{.S.K}}/{{.S.N}})</div><div class="tile"><b>{{pct .S.Lo}}–{{pct .S.Hi}}</b>95% interval</div><div class="tile"><b>{{pctP .S.Hallucination}}</b>Hallucination</div><div class="tile"><b>{{pctP .S.OverRefusal}}</b>Over-refusal</div><div class="tile"><b>{{pctP .S.Premise}}</b>Premise accepted</div><div class="tile"><b>{{fsec .S.MedianLatency}}</b>Median latency</div></div>
 <h2>Accuracy by category</h2><table><tr><th>Category</th><th>Correct</th><th>n</th><th>Accuracy</th></tr>{{range .S.CategoryOrder}}{{$g := index $.S.ByCategory .}}<tr><td>{{.}}</td><td>{{$g.K}}</td><td>{{$g.N}}</td><td>{{pct $g.Acc}}</td></tr>{{end}}</table>
@@ -463,7 +467,7 @@ func runsHandler(w http.ResponseWriter, r *http.Request) {
 	case "report.md":
 		w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
 		w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=report-%s.md", id))
-		io.WriteString(w, runMarkdown(run))
+		io.WriteString(w, trialWatermark()+runMarkdown(run))
 	case "run.json":
 		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=run-%s.json", id))
 		writeJSON(w, 200, run)
@@ -483,7 +487,7 @@ func runsHandler(w http.ResponseWriter, r *http.Request) {
 	case "report.html":
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		var buf bytes.Buffer
-		if err := htmlTmpl.Execute(&buf, map[string]interface{}{"Run": run, "S": summarize(run), "Version": version}); err != nil {
+		if err := htmlTmpl.Execute(&buf, map[string]interface{}{"Run": run, "S": summarize(run), "Version": version, "Watermark": strings.TrimSpace(trialWatermark())}); err != nil {
 			writeJSON(w, 500, map[string]string{"error": err.Error()})
 			return
 		}
@@ -506,6 +510,23 @@ func deref(p *int) int {
 
 func main() {
 	flag.Parse()
+	if *activate != "" {
+		p, err := verifyLicense(*activate)
+		if err != nil {
+			log.Fatalf("activation failed: %v", err)
+		}
+		os.MkdirAll(*dataDir, 0o755)
+		if err := os.WriteFile(licensePath(), []byte(strings.TrimSpace(*activate)+"\n"), 0o600); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Activated. Licensed to %s <%s>, %s plan, updates until %s. Saved to %s\n", p.Name, p.Email, p.Plan, p.Expires, licensePath())
+		return
+	}
+	if st := currentLicense(); st.Licensed {
+		log.Printf("licensed to %s <%s> (%s, updates until %s)", st.Payload.Name, st.Payload.Email, st.Payload.Plan, st.Payload.Expires)
+	} else {
+		log.Printf("TRIAL MODE (%s): starter questions + baseline style, watermarked exports. Activate with -activate <KEY> or in the lab page.", st.Reason)
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/health", cors(func(w http.ResponseWriter, r *http.Request) {
 		ollama := "unreachable"
@@ -516,8 +537,9 @@ func main() {
 			json.NewDecoder(resp.Body).Decode(&v)
 			ollama = "ok " + v.Version
 		}
-		writeJSON(w, 200, map[string]interface{}{"status": "ok", "version": version, "ollama": *ollamaURL, "ollama_status": ollama, "runs": len(listRuns()), "time": time.Now().UTC().Format(time.RFC3339)})
+		writeJSON(w, 200, map[string]interface{}{"status": "ok", "version": version, "ollama": *ollamaURL, "ollama_status": ollama, "runs": len(listRuns()), "licensed": currentLicense().Licensed, "time": time.Now().UTC().Format(time.RFC3339)})
 	}))
+	mux.HandleFunc("/api/license", cors(licenseHandler))
 	mux.HandleFunc("/api/ollama/", cors(proxyOllama))
 	mux.HandleFunc("/api/runs", cors(runsHandler))
 	mux.HandleFunc("/api/runs/", cors(runsHandler))

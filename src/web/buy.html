@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grocery-Store AI Test Kit — Learn to test AI before you ship it</title>
+<meta name="description" content="A hands-on kit for testing small AI models and AI applications before deployment: benchmark, tutorial, live lab, Go server, plus a 30-minute Zoom session with the creator. $250.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 fill=%27%23002d9c%27/%3E%3Ctext x=%278%27 y=%2712%27 font-size=%2710%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EG%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  if (window.tailwind) tailwind.config = { theme: { extend: { fontFamily: { sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'], mono: ['"IBM Plex Mono"', 'monospace'] },
+    colors: { ibm: { blue: '#0f62fe', navy: '#002d9c', ink: '#161616', gray: '#f4f4f4', line: '#e0e0e0' } } } } };
+</script>
+<style>
+  body { font-family: "IBM Plex Sans", system-ui, sans-serif; color: #161616; background: #fff; }
+  .card { border:1px solid #e0e0e0; border-top:4px solid #0f62fe; background:#fff; }
+  .btn { background:#0f62fe; color:#fff; padding:.8em 1.4em; font-weight:600; display:inline-block; } .btn:hover { background:#0353e9; }
+  .btn-secondary { background:#fff; color:#0f62fe; border:1px solid #0f62fe; padding:.6em 1.1em; font-weight:500; display:inline-block; } .btn-secondary:hover { background:#edf5ff; }
+  .info-btn { color:#0f62fe; text-decoration:underline dotted; cursor:pointer; }
+  .check li { padding-left:1.6em; position:relative; } .check li::before { content:"\2714"; position:absolute; left:0; color:#198038; font-weight:700; }
+  details summary { cursor:pointer; }
+</style>
+</head>
+<body class="bg-white text-ibm-ink">
+
+<header class="sticky top-0 z-40 bg-white border-b border-ibm-line">
+  <div class="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-3">
+    <a href="index.html" class="font-semibold text-ibm-navy text-lg">Grocery-Store AI Test</a>
+    <nav class="flex gap-3 text-sm">
+      <a href="index.html" class="px-2 py-1 hover:border-b-2 hover:border-ibm-blue">Tutorial</a>
+      <a href="lab.html" class="px-2 py-1 hover:border-b-2 hover:border-ibm-blue">Live Lab</a>
+      <a href="buy.html" class="px-2 py-1 border-b-2 border-ibm-blue font-medium">Buy</a>
+    </nav>
+    <div class="ml-auto flex items-center gap-1 text-sm">
+      <span class="hidden sm:inline mr-1">Text size</span>
+      <button onclick="fontSmaller()" class="btn-secondary !py-1 !px-2" aria-label="Smaller text">A&minus;</button>
+      <span class="w-12 text-center font-mono" data-font-value>16px</span>
+      <button onclick="fontBigger()" class="btn-secondary !py-1 !px-2" aria-label="Larger text">A+</button>
+      <button onclick="fontReset()" class="px-2 py-1 underline text-ibm-blue">reset</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-10 space-y-14 leading-relaxed">
+
+<!-- hero -->
+<section class="grid md:grid-cols-5 gap-8 items-start">
+  <div class="md:col-span-3">
+    <p class="uppercase tracking-wide text-sm text-ibm-blue font-semibold">Grocery-Store AI Test Kit</p>
+    <h1 class="text-3xl sm:text-5xl font-semibold text-ibm-navy mt-2 leading-tight">Learn to test an AI before you trust it.</h1>
+    <p class="mt-5 text-lg">AI agents and AI-powered apps fail in ways ordinary software never did: they make facts up, agree with wrong questions, ignore instructions, and give a different answer tomorrow. This kit teaches you to <b>find those failures on purpose</b> — on your own laptop, with a free local model, using a tiny fictional grocery store as the test subject — and to write the kind of evidence-based report that a team needs <b>before deployment</b>.</p>
+    <p class="mt-4">No GPU. No cloud account. No prior AI experience. Everything runs on a normal computer and is explained step by step.</p>
+    <div class="mt-6 flex flex-wrap gap-3 items-center">
+      <a href="#buy" class="btn">Buy the kit — $250</a>
+      <a href="index.html" class="btn-secondary">Try the free tutorial first</a>
+    </div>
+    <p class="mt-3 text-sm text-gray-700">One-time payment. Instant download. Includes a 30-minute Zoom with the creator.</p>
+  </div>
+  <div class="md:col-span-2 card p-5">
+    <p class="font-semibold text-ibm-navy text-lg">What arrives in your inbox</p>
+    <ul class="check mt-3 space-y-2 text-[0.95em]">
+      <li>Download link for the complete kit (zip, ~1 MB)</li>
+      <li>Your personal license key</li>
+      <li>A link to book your 30-minute Zoom session</li>
+      <li>The support email address and your order number</li>
+      <li>Updates for 12 months</li>
+    </ul>
+  </div>
+</section>
+
+<!-- who it is for -->
+<section>
+  <h2 class="text-2xl font-semibold text-ibm-navy">Who this is for</h2>
+  <div class="grid md:grid-cols-3 gap-4 mt-4">
+    <div class="card p-4"><p class="font-semibold">Developers and testers</p><p class="text-sm mt-1">You are adding a chatbot, an "ask your documents" feature or an AI agent to a product and need a repeatable way to prove it behaves — and to catch regressions when the model or prompt changes.</p></div>
+    <div class="card p-4"><p class="font-semibold">Students and self-learners</p><p class="text-sm mt-1">You want to understand what language models really do, hands-on, without a cloud bill. The tutorial is written at a level a motivated middle-schooler can follow; the statistics go as deep as you want.</p></div>
+    <div class="card p-4"><p class="font-semibold">Managers, analysts and QA leads</p><p class="text-sm mt-1">You have to sign off on an AI feature and want to ask the right questions: what was tested, how was it scored, how confident are we, and what happens when the model is wrong?</p></div>
+  </div>
+</section>
+
+<!-- what you learn -->
+<section>
+  <h2 class="text-2xl font-semibold text-ibm-navy">What you will learn</h2>
+  <p class="mt-2">The kit is built around the questions a team must answer before an AI application or agent goes live. Each one maps to a concrete test you will run yourself.</p>
+  <div class="overflow-x-auto mt-4">
+    <table class="w-full text-[0.95em] border border-ibm-line">
+      <thead class="bg-ibm-gray text-left"><tr><th class="p-2 border-b">Pre-deployment question</th><th class="p-2 border-b">The failure it guards against</th><th class="p-2 border-b">How the kit tests it</th></tr></thead>
+      <tbody>
+        <tr><td class="p-2 border-b">Does it stick to the facts it was given?</td><td class="p-2 border-b">Hallucination — inventing a phone number, a price, a policy</td><td class="p-2 border-b">5 unanswerable questions; hallucination rate</td></tr>
+        <tr><td class="p-2 border-b">Does it push back on wrong assumptions?</td><td class="p-2 border-b">Premise acceptance / sycophancy — "why does it close at noon?"</td><td class="p-2 border-b">4 false-premise questions; premise-acceptance rate</td></tr>
+        <tr><td class="p-2 border-b">Does it follow output rules?</td><td class="p-2 border-b">Format violations that break the code that reads the answer</td><td class="p-2 border-b">Strict-format questions; format-compliance rate</td></tr>
+        <tr><td class="p-2 border-b">Does it get numbers and names right?</td><td class="p-2 border-b">Wrong values, confused entities, misread "not"</td><td class="p-2 border-b">Arithmetic, comparison, negation, temporal categories</td></tr>
+        <tr><td class="p-2 border-b">Does the prompt wording change the behaviour?</td><td class="p-2 border-b">Prompt sensitivity; silent regressions when someone edits a system prompt</td><td class="p-2 border-b">8 prompt variants with Δ vs. baseline</td></tr>
+        <tr><td class="p-2 border-b">Is it the same answer every time?</td><td class="p-2 border-b">Non-determinism; flaky agent behaviour</td><td class="p-2 border-b">Repeats at temperature; consistency and flip rate</td></tr>
+        <tr><td class="p-2 border-b">Does extra context confuse it?</td><td class="p-2 border-b">Context interference; agents mixing up tools, documents or customers</td><td class="p-2 border-b">Distractor variant; the "no context" control</td></tr>
+        <tr><td class="p-2 border-b">Is model A really better than model B?</td><td class="p-2 border-b">Decisions made on noise</td><td class="p-2 border-b">Confidence intervals, paired bootstrap, sign test</td></tr>
+        <tr><td class="p-2 border-b">Can we explain the result to others?</td><td class="p-2 border-b">"It seemed fine in the demo"</td><td class="p-2 border-b">Researcher-style report with failure taxonomy, examples and methodology</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-3 text-sm">The same method transfers directly to your own application: swap the grocery-store text for your documents, write questions with known answers, run them on every model or prompt change, and keep the reports. The included <b>pre-deployment testing checklist</b> walks through that transfer for chatbots, retrieval (RAG) apps and tool-using agents.</p>
+</section>
+
+<!-- what you get -->
+<section>
+  <h2 class="text-2xl font-semibold text-ibm-navy">What you get</h2>
+  <div class="grid md:grid-cols-2 gap-4 mt-4">
+    <div class="card p-4">
+      <p class="font-semibold">The software (download)</p>
+      <ul class="check mt-2 space-y-1 text-[0.95em]">
+        <li>Interactive tutorial page with a simulated AI model — learn the ideas in minutes, nothing to install</li>
+        <li>Live Lab page: connects to a local model, checks prerequisites, runs tests, shows the model's thinking and the score, exports Markdown / CSV / PDF</li>
+        <li>Command-line benchmark: 42 tagged questions × 8 prompt styles, repeats, paraphrases, optional LLM judge, statistical report with charts</li>
+        <li>Go API server: saves runs, exports reports (Markdown, HTML, PDF, CSV), proxies the model so browsers never hit CORS</li>
+        <li>Setup wizard and tool checkers for Windows, macOS and Linux (CPU only)</li>
+        <li>Full source code (Python, JavaScript, Go) — no hidden services, nothing phones home</li>
+      </ul>
+    </div>
+    <div class="card p-4">
+      <p class="font-semibold">The learning material</p>
+      <ul class="check mt-2 space-y-1 text-[0.95em]">
+        <li>Step-by-step tutorial (web and text) written for beginners, with popups and links to official docs</li>
+        <li>Pre-deployment AI testing checklist for chatbots, RAG apps and agents</li>
+        <li>The scoring rules, failure-mode taxonomy and statistics explained, with their limits</li>
+        <li>A worked example report you can use as a template</li>
+      </ul>
+      <p class="font-semibold mt-4">People, not just files</p>
+      <ul class="check mt-2 space-y-1 text-[0.95em]">
+        <li><b>30-minute Zoom with the creator</b> — setup help, a walk-through of your first results, or how to adapt the kit to your own app. Book any time within 90 days of purchase.</li>
+        <li><b>Email support for 30 days</b> (installation and usage questions; replies within 2 business days)</li>
+        <li><b>Updates for 12 months</b> — new questions, prompt styles and report features as they ship</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- how buying works -->
+<section>
+  <h2 class="text-2xl font-semibold text-ibm-navy">How it works, start to finish</h2>
+  <ol class="mt-4 grid md:grid-cols-4 gap-4 text-[0.95em]">
+    <li class="card p-4"><p class="font-semibold text-ibm-navy">1. Buy</p>Pay $250 once with a card. You get an email with the download link, your license key and the booking link.</li>
+    <li class="card p-4"><p class="font-semibold text-ibm-navy">2. Install</p>Unzip. Install the free Ollama program (links included) and download a small model. The tool checker tells you if anything is missing.</li>
+    <li class="card p-4"><p class="font-semibold text-ibm-navy">3. Activate</p>Paste your key into the Live Lab or run <code class="font-mono">python activate.py KEY</code>. Verified on your computer; no account, no internet needed.</li>
+    <li class="card p-4"><p class="font-semibold text-ibm-navy">4. Learn and test</p>Follow the tutorial, run your first real test, book your Zoom, then point the method at your own application.</li>
+  </ol>
+</section>
+
+<!-- buy box -->
+<section id="buy" class="card p-6 md:p-8">
+  <div class="grid md:grid-cols-3 gap-6 items-center">
+    <div class="md:col-span-2">
+      <p class="uppercase tracking-wide text-sm text-ibm-blue font-semibold">Personal license</p>
+      <p class="text-4xl font-semibold text-ibm-navy mt-1">$250 <span class="text-base font-normal text-gray-700">one-time</span></p>
+      <ul class="check mt-4 space-y-1 text-[0.95em]">
+        <li>Complete kit with full source code, for one person</li>
+        <li>License key, instant download</li>
+        <li>30-minute Zoom session with the creator</li>
+        <li>30 days of email support, 12 months of updates</li>
+        <li>14-day money-back guarantee if the kit does not run on your machine and we cannot fix it together</li>
+      </ul>
+      <p class="text-sm text-gray-700 mt-3">Team license (5 seats, one group Zoom) available — <a class="underline text-ibm-blue" href="mailto:SUPPORT_EMAIL_PLACEHOLDER?subject=Team%20license">ask by email</a>.</p>
+    </div>
+    <div class="text-center">
+      <!-- Replace the href with your Stripe Payment Link / Gumroad / Lemon Squeezy checkout URL (see docs/GO_TO_MARKET.md). -->
+      <a id="checkout-link" href="CHECKOUT_URL_PLACEHOLDER" class="btn text-lg w-full">Buy now — $250</a>
+      <p class="text-xs text-gray-700 mt-2">Secure card payment. Taxes calculated at checkout. You will receive your key within minutes.</p>
+      <p class="text-xs text-gray-700 mt-2">Questions before buying? <a class="underline text-ibm-blue" href="mailto:SUPPORT_EMAIL_PLACEHOLDER">Email us</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- requirements -->
+<section>
+  <h2 class="text-2xl font-semibold text-ibm-navy">Requirements</h2>
+  <div class="grid md:grid-cols-2 gap-4 mt-4 text-[0.95em]">
+    <div class="card p-4"><p class="font-semibold">Your computer</p><ul class="list-disc ml-5 mt-2 space-y-1"><li>Windows 10/11, macOS 12+, or Linux</li><li>8 GB RAM recommended (4 GB works with a 1B model)</li><li>2–4 GB of free disk space for a model</li><li>No graphics card needed — everything runs on the CPU</li></ul></div>
+    <div class="card p-4"><p class="font-semibold">Free software you install</p><ul class="list-disc ml-5 mt-2 space-y-1"><li><a class="underline text-ibm-blue" target="_blank" rel="noopener" href="https://ollama.com/download">Ollama</a> (runs the model)</li><li><a class="underline text-ibm-blue" target="_blank" rel="noopener" href="https://www.python.org/downloads/">Python 3.9+</a> for the command-line tools (optional for the web pages)</li><li><a class="underline text-ibm-blue" target="_blank" rel="noopener" href="https://go.dev/dl/">Go 1.21+</a> only if you want to run the API server from source (prebuilt binaries can be provided)</li><li>A modern browser (Chrome, Edge, Firefox, Safari)</li></ul></div>
+  </div>
+</section>
+
+<!-- faq -->
+<section>
+  <h2 class="text-2xl font-semibold text-ibm-navy">Questions people ask</h2>
+  <div class="mt-4 space-y-2">
+    <details class="card p-4"><summary class="font-semibold">I have never run an AI model. Can I do this?</summary><p class="mt-2 text-[0.95em]">Yes. The tutorial starts from "what is a language model" and uses a simulated model that needs no setup. The wizard and tool checkers get you through the real installation, and the Zoom session is there if you get stuck.</p></details>
+    <details class="card p-4"><summary class="font-semibold">Does it work on my own data instead of the grocery store?</summary><p class="mt-2 text-[0.95em]">Yes. The grocery store is a teaching example. Replace the text file and the questions file with your own document and questions; the scorer, runner, lab and reports work unchanged. The checklist explains how to write good questions for chatbots, document-search apps and agents.</p></details>
+    <details class="card p-4"><summary class="font-semibold">Which models can I test?</summary><p class="mt-2 text-[0.95em]">Anything Ollama can run: deepseek-r1, llama 3.2, gemma 3, qwen 3, mistral, phi and hundreds more, including larger ones if you have the memory. The runner only uses Ollama's standard API, so any server that speaks it also works.</p></details>
+    <details class="card p-4"><summary class="font-semibold">Is there a subscription? Does it phone home?</summary><p class="mt-2 text-[0.95em]">No subscription. The license key is checked on your computer against a public key; nothing is sent anywhere. The software keeps working forever; the key's date only controls how long you get updates and support.</p></details>
+    <details class="card p-4"><summary class="font-semibold">What does "trial mode" mean?</summary><p class="mt-2 text-[0.95em]">Without a key, the kit runs the 6 starter questions in the baseline prompt style and watermarks exports — enough to confirm it works on your machine. The key unlocks all 42 questions, all 8 prompt styles, repeats and clean reports.</p></details>
+    <details class="card p-4"><summary class="font-semibold">How do I book the Zoom session?</summary><p class="mt-2 text-[0.95em]">Your purchase email contains a booking link. Pick any slot within 90 days of purchase. Come with your questions, or share your screen and we set things up together.</p></details>
+    <details class="card p-4"><summary class="font-semibold">Can my team use it?</summary><p class="mt-2 text-[0.95em]">A personal license is for one person. For a team, email for a 5-seat license, which includes one group Zoom session.</p></details>
+    <details class="card p-4"><summary class="font-semibold">Refunds?</summary><p class="mt-2 text-[0.95em]">If the kit will not run on your machine and we cannot fix it together within 14 days, you get your money back. Because the download includes full source code, other refunds are at our discretion.</p></details>
+  </div>
+</section>
+
+<section class="text-center">
+  <a href="#buy" class="btn text-lg">Buy the kit — $250</a>
+  <p class="mt-3 text-sm text-gray-700">or <a class="underline text-ibm-blue" href="index.html">try the free tutorial</a> first.</p>
+</section>
+
+</main>
+
+<footer class="border-t border-ibm-line mt-10">
+  <div class="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-700">
+    <p>SELLER_NAME_PLACEHOLDER · <a class="underline" href="mailto:SUPPORT_EMAIL_PLACEHOLDER">SUPPORT_EMAIL_PLACEHOLDER</a> · <a class="underline" href="eula.html">License terms</a> · Maple Street Market is fictional. Ollama, DeepSeek, Llama and Gemma are trademarks of their owners and are not affiliated with this product. &copy; <span id="year"></span></p>
+  </div>
+</footer>
+
+<script src="common.js"></script>
+</body>
+</html>

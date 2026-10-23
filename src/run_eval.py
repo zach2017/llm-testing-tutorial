@@ -34,6 +34,7 @@ from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from grocery_eval import license as lic  # noqa: E402
 from grocery_eval.mock_backend import MOCK_MODELS, mock_chat  # noqa: E402
 from grocery_eval.ollama_client import OllamaClient, OllamaError  # noqa: E402
 from grocery_eval.report import load_jsonl, write_report  # noqa: E402
@@ -181,6 +182,16 @@ def main(argv: Optional[List[str]] = None) -> int:
         questions = [q for q in questions if q["category"] in set(args.categories)]
     if args.limit:
         questions = questions[: args.limit]
+    # --- license / trial limits (the mock backend and self-test are always free)
+    lic_status = lic.status()
+    print(lic.banner())
+    if not lic_status["licensed"] and args.backend == "ollama":
+        before_q, before_v = len(questions), len(variant_names)
+        questions = [q for q in questions if q["id"] in lic.TRIAL_QUESTIONS]
+        variant_names = [v for v in variant_names if v in lic.TRIAL_VARIANTS]
+        if len(questions) < before_q or len(variant_names) < before_v:
+            print(f"Trial mode: limited to questions {', '.join(lic.TRIAL_QUESTIONS)} and the {', '.join(lic.TRIAL_VARIANTS)} style "
+                  f"({len(questions)} questions x {len(variant_names)} style). Activate to unlock all 42 questions and 8 styles.")
     instances = expand_questions(questions, args.paraphrases)
     if not instances:
         ap.error("no questions selected")
@@ -334,7 +345,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 0
     rows = load_jsonl([jsonl_path])
     meta = {
-        "title": "Grocery-Store Reading Comprehension Benchmark",
+        "title": "Grocery-Store Reading Comprehension Benchmark" + ("" if lic_status["licensed"] else " (TRIAL MODE - unlicensed copy)"),
         "generated_at": dt.datetime.now().isoformat(timespec="seconds"),
         "document": data["document_name"], "document_sha256": data["document_sha256"],
         "backend": args.backend, "ollama_version": ollama_version, "run_id": run_id,

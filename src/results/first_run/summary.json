@@ -1,0 +1,514 @@
+{
+  "models": [
+    "deepseek-r1:1.5b"
+  ],
+  "variants": [
+    "baseline",
+    "strict_grounded"
+  ],
+  "categories": [
+    "arithmetic",
+    "comparison",
+    "counting",
+    "factual",
+    "false_premise",
+    "instruction_following",
+    "negation",
+    "temporal",
+    "unanswerable"
+  ],
+  "n_rows": 84,
+  "n_errors": 0,
+  "n_scored_rows": 84,
+  "baseline_variant": "baseline",
+  "control_variants": [
+    "no_context"
+  ],
+  "repeats": 1,
+  "temperatures": [
+    0.0
+  ],
+  "headline": {
+    "deepseek-r1:1.5b": {
+      "n": 84,
+      "correct": 52,
+      "accuracy": 0.6190476190476191,
+      "ci_low": 0.5121524397704628,
+      "ci_high": 0.7155301161028366,
+      "mean_score": 0.6190476190476191,
+      "hallucination_rate": 0.5,
+      "over_refusal_rate": 0.030303030303030304,
+      "premise_acceptance_rate": 0.875,
+      "format_compliance": 0.16666666666666666,
+      "median_latency_s": 7.6578294374921825,
+      "mean_tokens_per_s": 42.70678263843898,
+      "mean_answer_words": 17.833333333333332,
+      "errors": 0,
+      "judge_accuracy": null,
+      "judge_n": 0,
+      "judge_agreement_with_heuristic": null,
+      "consistency": null,
+      "flip_rate": null,
+      "paraphrase_consistency": null,
+      "paraphrase_groups": 0
+    }
+  },
+  "by_category": {
+    "deepseek-r1:1.5b": {
+      "arithmetic": {
+        "n": 16,
+        "correct": 12,
+        "accuracy": 0.75,
+        "ci_low": 0.5050123107060135,
+        "ci_high": 0.8981809801576265,
+        "mean_score": 0.75
+      },
+      "comparison": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666,
+        "ci_low": 0.29998832134152864,
+        "ci_high": 0.9032306674407831,
+        "mean_score": 0.6666666666666666
+      },
+      "counting": {
+        "n": 4,
+        "correct": 4,
+        "accuracy": 1.0,
+        "ci_low": 0.5100999795960008,
+        "ci_high": 1.0,
+        "mean_score": 1.0
+      },
+      "factual": {
+        "n": 18,
+        "correct": 14,
+        "accuracy": 0.7777777777777778,
+        "ci_low": 0.5478497354769452,
+        "ci_high": 0.90999218086618,
+        "mean_score": 0.7777777777777778
+      },
+      "false_premise": {
+        "n": 8,
+        "correct": 1,
+        "accuracy": 0.125,
+        "ci_low": 0.02241690886329617,
+        "ci_high": 0.4708948057698615,
+        "mean_score": 0.125
+      },
+      "instruction_following": {
+        "n": 6,
+        "correct": 0,
+        "accuracy": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.3903430336530645,
+        "mean_score": 0.0
+      },
+      "negation": {
+        "n": 6,
+        "correct": 4,
+        "accuracy": 0.6666666666666666,
+        "ci_low": 0.29998832134152864,
+        "ci_high": 0.9032306674407831,
+        "mean_score": 0.6666666666666666
+      },
+      "temporal": {
+        "n": 10,
+        "correct": 8,
+        "accuracy": 0.8,
+        "ci_low": 0.49015684672072335,
+        "ci_high": 0.9433190520193067,
+        "mean_score": 0.8
+      },
+      "unanswerable": {
+        "n": 10,
+        "correct": 5,
+        "accuracy": 0.5,
+        "ci_low": 0.23658959361548731,
+        "ci_high": 0.7634104063845126,
+        "mean_score": 0.5
+      }
+    }
+  },
+  "by_position": {
+    "deepseek-r1:1.5b": {
+      "start": {
+        "n": 24,
+        "correct": 19,
+        "accuracy": 0.7916666666666666,
+        "ci_low": 0.5952915551476452,
+        "ci_high": 0.9075531089521192,
+        "mean_score": 0.7916666666666666
+      },
+      "middle": {
+        "n": 34,
+        "correct": 21,
+        "accuracy": 0.6176470588235294,
+        "ci_low": 0.4504071999938267,
+        "ci_high": 0.7610003514839122,
+        "mean_score": 0.6176470588235294
+      },
+      "end": {
+        "n": 16,
+        "correct": 7,
+        "accuracy": 0.4375,
+        "ci_low": 0.2309836333518552,
+        "ci_high": 0.6682180439322347,
+        "mean_score": 0.4375
+      }
+    }
+  },
+  "by_difficulty": {
+    "deepseek-r1:1.5b": {
+      "1": {
+        "n": 28,
+        "correct": 20,
+        "accuracy": 0.7142857142857143,
+        "ci_low": 0.529403642629825,
+        "ci_high": 0.8474618415167003,
+        "mean_score": 0.7142857142857143
+      },
+      "2": {
+        "n": 44,
+        "correct": 29,
+        "accuracy": 0.6590909090909091,
+        "ci_low": 0.5113886797193951,
+        "ci_high": 0.7812436737136005,
+        "mean_score": 0.6590909090909091
+      },
+      "3": {
+        "n": 12,
+        "correct": 3,
+        "accuracy": 0.25,
+        "ci_low": 0.08894003962896138,
+        "ci_high": 0.53231033912066,
+        "mean_score": 0.25
+      }
+    }
+  },
+  "by_variant": {
+    "deepseek-r1:1.5b": {
+      "baseline": {
+        "n": 42,
+        "correct": 28,
+        "accuracy": 0.6666666666666666,
+        "ci_low": 0.5155222701166692,
+        "ci_high": 0.7898771923802769,
+        "mean_score": 0.6666666666666666,
+        "refusal_rate": 0.11904761904761904,
+        "mean_answer_words": 22.166666666666668,
+        "delta_vs_baseline": null
+      },
+      "strict_grounded": {
+        "n": 42,
+        "correct": 24,
+        "accuracy": 0.5714285714285714,
+        "ci_low": 0.4220597791187447,
+        "ci_high": 0.7088257048085179,
+        "mean_score": 0.5714285714285714,
+        "refusal_rate": 0.19047619047619047,
+        "mean_answer_words": 13.5,
+        "delta_vs_baseline": -0.09523809523809523
+      }
+    }
+  },
+  "control": {},
+  "failure_modes": {
+    "deepseek-r1:1.5b": {
+      "wrong_value": 3,
+      "wrong_entity": 5,
+      "partial": 0,
+      "no_answer": 8,
+      "hallucination": 4,
+      "over_refusal": 2,
+      "premise_accepted": 7,
+      "format_violation": 3,
+      "error": 0
+    }
+  },
+  "process": {
+    "deepseek-r1:1.5b": {
+      "answer_words_correct": 20.153846153846153,
+      "answer_words_incorrect": 14.0625,
+      "thinking_rows": 84
+    }
+  },
+  "pairwise": [],
+  "per_question": {
+    "Q01": {
+      "category": "factual",
+      "question": "Who founded Maple Street Market?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q02": {
+      "category": "factual",
+      "question": "Who currently owns the store?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q03": {
+      "category": "factual",
+      "question": "How many people does the store employ?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q04": {
+      "category": "factual",
+      "question": "Who is the store manager?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q05": {
+      "category": "factual",
+      "question": "How much does a gallon of whole milk cost?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q06": {
+      "category": "factual",
+      "question": "What is the price of one blueberry muffin?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q07": {
+      "category": "factual",
+      "question": "What is the email address for contacting the manager?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q08": {
+      "category": "factual",
+      "question": "How many parking spaces does the store's lot have?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q09": {
+      "category": "temporal",
+      "question": "What time does the store open on Sundays?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q10": {
+      "category": "temporal",
+      "question": "Is the store open at 8:00 PM on a Saturday?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q11": {
+      "category": "temporal",
+      "question": "Is the store open at 8:00 PM on a Sunday?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q12": {
+      "category": "temporal",
+      "question": "On which holidays is the store closed?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q13": {
+      "category": "temporal",
+      "question": "At what time does the bakery counter stop serving each day?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q14": {
+      "category": "factual",
+      "question": "In what year did the pharmacy counter close?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q15": {
+      "category": "arithmetic",
+      "question": "How much do 3 pounds of regular apples cost?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q16": {
+      "category": "arithmetic",
+      "question": "What is the total cost of 2 sourdough loaves and 1 dozen large eggs, before any discounts?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q17": {
+      "category": "arithmetic",
+      "question": "On a Tuesday, what does one sourdough loaf cost after the Tuesday bakery discount? Ignore the Rewards card.",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q18": {
+      "category": "arithmetic",
+      "question": "A customer buys 3 cans of tomato soup. How much do they pay for the soup?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q19": {
+      "category": "arithmetic",
+      "question": "A Maple Rewards member buys groceries totaling $20.00 with no other discounts. How much do they pay after the Rewards discount?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q20": {
+      "category": "arithmetic",
+      "question": "A customer who lives 3 miles from the store orders $42.00 of groceries for delivery. What delivery fee do they pay?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q21": {
+      "category": "arithmetic",
+      "question": "A customer who lives 3 miles from the store orders $55.00 of groceries for delivery. What delivery fee do they pay?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q22": {
+      "category": "arithmetic",
+      "question": "For how many years did Helen Park own the store before Daniel Park took over?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q23": {
+      "category": "counting",
+      "question": "How many checkout stations does the store have in total, counting both regular lanes and self-checkout kiosks?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q24": {
+      "category": "counting",
+      "question": "How many departments does the store have?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q25": {
+      "category": "comparison",
+      "question": "Which costs more per pound: bananas or regular apples?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q26": {
+      "category": "comparison",
+      "question": "How many times more expensive are organic apples than regular apples?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q27": {
+      "category": "comparison",
+      "question": "Which is more expensive per pound: sliced turkey or sharp cheddar cheese?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q28": {
+      "category": "negation",
+      "question": "Does the store sell tobacco?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q29": {
+      "category": "negation",
+      "question": "Can a customer return a perishable item if they have a receipt?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q30": {
+      "category": "negation",
+      "question": "Which one of the following does the store NOT sell: bananas, eggs, beer, or turkey?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q31": {
+      "category": "unanswerable",
+      "question": "What is the store's phone number?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q32": {
+      "category": "unanswerable",
+      "question": "How much does a loaf of rye bread cost?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q33": {
+      "category": "unanswerable",
+      "question": "Who is the assistant manager?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q34": {
+      "category": "unanswerable",
+      "question": "How many employees work in the deli department?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q35": {
+      "category": "unanswerable",
+      "question": "What is the store's annual revenue?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q36": {
+      "category": "false_premise",
+      "question": "Why does the store close at noon on Sundays?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q37": {
+      "category": "false_premise",
+      "question": "What discount does the store offer on wine on Fridays?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q38": {
+      "category": "false_premise",
+      "question": "What are the pharmacy counter's opening hours?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q39": {
+      "category": "false_premise",
+      "question": "Why did Rosa Delgado decide to found the store in 1998?",
+      "overall": 0.5,
+      "deepseek-r1:1.5b": 0.5
+    },
+    "Q40": {
+      "category": "instruction_following",
+      "question": "Answer with only a number and nothing else: how many self-checkout kiosks does the store have?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q41": {
+      "category": "instruction_following",
+      "question": "Reply with exactly one word, YES or NO: does the store offer home delivery?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    },
+    "Q42": {
+      "category": "instruction_following",
+      "question": "List the store's five departments, separated by commas, with no other words.",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    }
+  },
+  "meta": {
+    "title": "Grocery-Store Reading Comprehension Benchmark",
+    "generated_at": "2026-10-23T16:18:42",
+    "document": "grocery_store.txt",
+    "document_sha256": "0d304fededf1132c5d9cf1cdb1b225b8641ed36d303c120a28443bc81bd829cb",
+    "backend": "ollama",
+    "ollama_version": "0.34.0",
+    "run_id": "20261023-160229-600535",
+    "config": {
+      "models": [
+        "deepseek-r1:1.5b"
+      ],
+      "variants": [
+        "baseline",
+        "strict_grounded"
+      ],
+      "repeats": 1,
+      "temperature": 0.0,
+      "seed": 42,
+      "num_predict": 1500,
+      "paraphrases": false,
+      "judge_model": null
+    }
+  }
+}

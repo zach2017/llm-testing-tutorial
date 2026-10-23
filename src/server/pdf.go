@@ -197,6 +197,9 @@ func runPDF(run *Run) []byte {
 	s := summarize(run)
 	d := newPDF()
 	d.line("Grocery-Store Benchmark - "+run.Model, 18, true, 0)
+	if wm := trialWatermark(); wm != "" {
+		d.line(strings.TrimSpace(wm), 9, true, 0)
+	}
 	status := ""
 	if !run.Finished {
 		status = " (incomplete)"

@@ -33,6 +33,7 @@
     <nav class="flex gap-3 text-sm">
       <a href="index.html" class="px-2 py-1 hover:border-b-2 hover:border-ibm-blue">Tutorial</a>
       <a href="lab.html" class="px-2 py-1 border-b-2 border-ibm-blue font-medium">Live Lab</a>
+      <a href="buy.html" class="px-2 py-1 hover:border-b-2 hover:border-ibm-blue">Buy</a>
     </nav>
     <div class="ml-auto flex items-center gap-1 text-sm">
       <span class="hidden sm:inline mr-1">Text size</span>
@@ -51,6 +52,21 @@
   <h1 class="text-3xl sm:text-4xl font-semibold text-ibm-navy mt-1">Test a real model running on your computer</h1>
   <p class="mt-3 text-lg">This page talks directly to <b>Ollama</b> on your machine. Nothing is sent to the internet. Your settings and results are kept in your browser's <a class="info-btn" data-info="localstorage">localStorage</a>; if you also run the optional Go server, results are saved to disk and can be exported as Markdown or PDF.</p>
   <p class="mt-2 text-sm">New to this? Start with the <a class="text-ibm-blue underline" href="index.html">tutorial</a>, which has a simulated model that needs no setup.</p>
+</section>
+
+<!-- ============ 0. license ============ -->
+<section id="license">
+  <div class="card p-4 flex flex-wrap items-start gap-4">
+    <div class="flex-1 min-w-[16rem]">
+      <p class="font-semibold text-ibm-navy">License <a class="info-btn text-sm" data-info="license">?</a></p>
+      <p id="lic-status" class="mt-1 text-[0.95em]">Checking...</p>
+    </div>
+    <div class="flex-1 min-w-[18rem] no-print">
+      <label class="block text-sm font-semibold">Activate: paste the key from your purchase email</label>
+      <div class="flex gap-2 mt-1"><input id="lic-key" class="w-full border border-gray-400 p-2 font-mono text-sm" placeholder="GLE1-..."><button class="btn whitespace-nowrap" onclick="activateLicense()">Activate</button></div>
+      <p class="text-xs text-gray-700 mt-1">Checked on your computer against the publisher's public key; nothing is uploaded. <a class="underline text-ibm-blue" href="buy.html">Need a key?</a> <a class="underline text-ibm-blue cursor-pointer" onclick="removeLicense()">Remove key</a></p>
+    </div>
+  </div>
 </section>
 
 <!-- ============ 1. configuration ============ -->
@@ -178,6 +194,7 @@
 
 <script src="data.js"></script>
 <script src="scoring.js"></script>
+<script src="license.js"></script>
 <script src="common.js"></script>
 <script>
 (function () {
@@ -186,9 +203,39 @@
   const DEFAULTS = { host: "http://localhost:11434", model: "deepseek-r1:1.5b", server: "", predict: 1500, temp: 0, think: "", route: "direct" };
   const qById = Object.fromEntries(D.questions.map((q) => [q.id, q]));
   const STARTER = ["Q01", "Q05", "Q15", "Q28", "Q31", "Q36"];
+  const LIC = window.GroceryLicense, LS_LIC = "grocery.license";
+  let licState = { licensed: false, payload: null, reason: "no license key found (trial mode)" };
+  function setLicense(key) {
+    const r = key ? LIC.verifyKey(key) : { payload: null, reason: "no license key found (trial mode)" };
+    licState = { licensed: !!r.payload, payload: r.payload, reason: r.reason, key };
+    const el = byId("lic-status");
+    if (licState.licensed) { const p = r.payload; el.innerHTML = `<span class="ok font-semibold">Licensed</span> to ${escapeHtml(p.name)} &lt;${escapeHtml(p.email)}&gt; · ${escapeHtml(p.plan)} plan · updates and support until ${escapeHtml(p.expires)}${LIC.updatesExpired(p) ? ' <span class="warn">(updates period ended; software keeps working)</span>' : ""}`; }
+    else el.innerHTML = `<span class="warn font-semibold">Trial mode</span> — ${escapeHtml(r.reason)}. Limited to the starter questions and the baseline style; exports are watermarked.`;
+    applyTrialLimits();
+  }
+  function applyTrialLimits() {
+    document.querySelectorAll(".q-check").forEach((cb) => { const allowed = licState.licensed || LIC.TRIAL_QUESTIONS.includes(cb.value); cb.disabled = !allowed; if (!allowed) cb.checked = false; cb.closest("label").classList.toggle("opacity-50", !allowed); });
+    document.querySelectorAll(".v-check").forEach((cb) => { const allowed = licState.licensed || LIC.TRIAL_VARIANTS.includes(cb.value); cb.disabled = !allowed; if (!allowed) cb.checked = false; cb.closest("label").classList.toggle("opacity-50", !allowed); });
+    const rep = byId("run-repeats"); if (rep) { rep.disabled = !licState.licensed; if (!licState.licensed) rep.value = 1; }
+    if (typeof updateEstimate === "function") updateEstimate();
+  }
+  window.activateLicense = async function () {
+    const key = byId("lic-key").value.trim(); const r = LIC.verifyKey(key);
+    if (!r.payload) { byId("lic-status").innerHTML = `<span class="bad">Activation failed: ${escapeHtml(r.reason)}</span>. Check that the whole key was pasted.`; return; }
+    lsSet(LS_LIC, key); setLicense(key); byId("lic-key").value = "";
+    const c = readConfig(); if (c.server) { try { await fetchJson(c.server + "/api/license", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key }) }, 5000); byId("lic-status").innerHTML += " · also saved on the Go server"; } catch (e) {} }
+  };
+  window.removeLicense = async function () { try { localStorage.removeItem(LS_LIC); } catch (e) {} setLicense(""); const c = readConfig(); if (c.server) { try { await fetch(c.server + "/api/license", { method: "DELETE" }); } catch (e) {} } };
+  async function loadLicense() {
+    let key = lsGet(LS_LIC) || "";
+    const c = readConfig();
+    if (!key && c.server) { try { const st = await fetchJson(c.server + "/api/license", null, 3000); if (st.licensed && st.payload) { licState = { licensed: true, payload: st.payload, reason: "" }; byId("lic-status").innerHTML = `<span class="ok font-semibold">Licensed</span> (via Go server) to ${escapeHtml(st.payload.name)} · updates until ${escapeHtml(st.payload.expires)}`; applyTrialLimits(); return; } } catch (e) {} }
+    setLicense(key);
+  }
 
   // ---------- popups
   window.INFO = {
+    license: { title: "How licensing works", links: [], html: "<p>Your key is a signed message from the publisher containing your name, email and the date until which you receive updates and support. The pages, the Python tools and the Go server verify the signature offline, so no activation server is needed and nothing phones home.</p><p class='mt-2'><b>Trial mode</b> (no key): the 6 starter questions and the baseline prompt style, with watermarked exports - enough to see the tool work. <b>Licensed</b>: all 42 questions, all 8 prompt styles, repeats, clean exports. The software keeps working after the updates date; only new versions and support stop.</p><p class='mt-2'>Where the key is stored: this browser's localStorage, and - if a Go server is connected - in its data folder so every page and the command-line tools share it.</p>" },
     localstorage: { title: "What is localStorage?", links: ["localStorage"], html: "<p>Every web page can keep a small notebook inside your browser, called localStorage. This page writes your settings and your results there. It stays on your computer, it is never uploaded, and it survives closing the tab. It is wiped if you clear the browser's site data, use a private window, or switch browsers — which is why the Go server exists for keeping runs permanently.</p>" },
     host: { title: "Ollama address", links: ["ollamaFaq"], html: "<p>Ollama listens on port 11434 of your own computer, so the address is normally <code class='font-mono'>http://localhost:11434</code>. If Ollama runs on another machine on your network, use its address (and set <code class='font-mono'>OLLAMA_HOST=0.0.0.0</code> there).</p>" },
     model: { title: "Which model?", links: ["deepseek", "gemma", "llama"], html: "<p>Type the exact tag you pulled with <code class='font-mono'>ollama pull</code>, or press <i>List installed</i>. <b>deepseek-r1:1.5b</b> shows its thinking (slow but instructive); <b>gemma3:1b</b> and <b>llama3.2:1b</b> are quick, non-thinking models; <b>llama3.2:3b</b> and <b>qwen3:1.7b</b> are good next steps.</p>" },
@@ -277,10 +324,11 @@
   byId("q-list").innerHTML = D.questions.map((q) => `<label class="flex gap-2"><input type="checkbox" class="q-check mt-1" value="${q.id}" ${STARTER.includes(q.id) ? "checked" : ""}><span><b>${q.id}</b> <span class="text-gray-700">[${q.category}]</span> ${escapeHtml(q.question)}</span></label>`).join("");
   byId("cat-buttons").innerHTML = Object.keys(D.categories).map((cat) => `<button class="btn-secondary !py-1 !px-2" onclick="selectQ('${cat}')">${cat}</button>`).join(" ");
   byId("v-list").innerHTML = Object.entries(D.prompts.variants).map(([v, d]) => `<label class="flex gap-2"><input type="checkbox" class="v-check mt-1" value="${v}" ${v === "baseline" ? "checked" : ""}><span><b>${v}</b> <span class="text-gray-700">— ${escapeHtml(d.description)}</span></span></label>`).join("");
-  window.selectQ = function (what) { document.querySelectorAll(".q-check").forEach((cb) => { const q = qById[cb.value]; cb.checked = what === "all" ? true : what === "none" ? false : what === "starter" ? STARTER.includes(q.id) : q.category === what; }); updateEstimate(); };
+  window.selectQ = function (what) { document.querySelectorAll(".q-check").forEach((cb) => { const q = qById[cb.value]; cb.checked = (what === "all" ? true : what === "none" ? false : what === "starter" ? STARTER.includes(q.id) : q.category === what) && !cb.disabled; }); updateEstimate(); };
   function selected(cls) { return [...document.querySelectorAll("." + cls + ":checked")].map((cb) => cb.value); }
   function updateEstimate() { const nq = selected("q-check").length, nv = selected("v-check").length, rep = +byId("run-repeats").value || 1; byId("q-count").textContent = nq; const calls = nq * nv * rep; byId("run-estimate").innerHTML = `<b>${calls}</b> calls. On a laptop CPU a thinking model takes 20–90 s each (about ${Math.round(calls * 0.5)}–${Math.round(calls * 1.5)} min); a non-thinking 1B model a few seconds each.`; }
   document.addEventListener("change", (e) => { if (e.target.matches(".q-check, .v-check, #run-repeats")) updateEstimate(); }); updateEstimate();
+  loadLicense();
 
   // ---------- runs storage
   function loadRuns() { try { return JSON.parse(lsGet(LS_RUNS) || "[]"); } catch (e) { return []; } }
@@ -301,7 +349,7 @@
     const qs = selected("q-check"), vs = selected("v-check"), rep = Math.max(1, +byId("run-repeats").value || 1);
     if (!qs.length || !vs.length || !c.model) { byId("run-status").innerHTML = '<span class="bad">Pick at least one question, one prompt style and a model.</span>'; return; }
     abort = new AbortController(); byId("run-btn").disabled = true; byId("stop-btn").disabled = false;
-    const run = { id: new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "-" + Math.random().toString(36).slice(2, 6), started_at: new Date().toISOString(), model: c.model, host: c.host, route: c.route, settings: { num_predict: c.predict, temperature: c.temp, think: c.think, repeats: rep }, variants: vs, question_ids: qs, rows: [], finished: false };
+    const run = { id: new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "-" + Math.random().toString(36).slice(2, 6), started_at: new Date().toISOString(), model: c.model, host: c.host, route: c.route, settings: { num_predict: c.predict, temperature: c.temp, think: c.think, repeats: rep }, variants: vs, question_ids: qs, rows: [], finished: false, licensed: licState.licensed };
     current = run; byId("answer-list").innerHTML = ""; byId("live-summary").classList.remove("hidden");
     const total = qs.length * vs.length * rep; let done = 0;
     outer: for (const v of vs) for (const qid of qs) for (let r = 0; r < rep; r++) {
@@ -358,7 +406,7 @@
   }
   function reportMarkdown(run) {
     const s = summarize(run), na = (x) => x == null ? "n/a" : pct(x);
-    const L = [`# Grocery-Store Benchmark — ${run.model}`, "", `Run ${run.id}, started ${run.started_at}${run.finished ? "" : " (incomplete)"}. Settings: max tokens ${run.settings.num_predict}, temperature ${run.settings.temperature}, thinking ${run.settings.think || "default"}, repeats ${run.settings.repeats}. Connection: ${run.route}.`, "",
+    const L = [`# Grocery-Store Benchmark — ${run.model}`, "", ...(licState.licensed ? [] : ["> TRIAL MODE - unlicensed copy of grocery-llm-eval. See buy.html to get a license key.", ""]), `Run ${run.id}, started ${run.started_at}${run.finished ? "" : " (incomplete)"}. Settings: max tokens ${run.settings.num_predict}, temperature ${run.settings.temperature}, thinking ${run.settings.think || "default"}, repeats ${run.settings.repeats}. Connection: ${run.route}.`, "",
       "## Headline", "", "| Metric | Value |", "|---|---|", `| Accuracy (excl. no_context) | ${pct(s.acc)} (${s.k}/${s.n}) |`, `| 95% Wilson interval | ${pct(s.lo)} – ${pct(s.hi)} |`, `| Hallucination rate (unanswerable Qs) | ${na(s.hallucination)} |`, `| Over-refusal rate (answerable Qs) | ${na(s.overRefusal)} |`, `| Premise acceptance (false-premise Qs) | ${na(s.premise)} |`, `| Median latency | ${s.medianLatency == null ? "n/a" : s.medianLatency.toFixed(1) + " s"} |`, `| Mean tokens/s | ${s.meanTps == null ? "n/a" : s.meanTps.toFixed(1)} |`, "",
       "## Accuracy by category", "", "| Category | Correct | n | Accuracy |", "|---|---|---|---|", ...Object.entries(s.byCategory).map(([c, g]) => `| ${c} | ${g.k} | ${g.n} | ${pct(g.k / g.n)} |`), "",
       "## Accuracy by prompt style", "", "| Variant | Correct | n | Accuracy |", "|---|---|---|---|", ...Object.entries(s.byVariant).map(([c, g]) => `| ${c} | ${g.k} | ${g.n} | ${pct(g.k / g.n)} |`), "",
@@ -371,7 +419,7 @@
   function reportHtml(run) {
     const s = summarize(run), na = (x) => x == null ? "n/a" : pct(x);
     const table = (hdr, rows) => `<table class="w-full text-sm border border-ibm-line mt-2"><thead class="bg-ibm-gray text-left"><tr>${hdr.map((h) => `<th class="p-2 border-b">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td class="p-2 border-b align-top">${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-    return `<div class="card p-4"><h3 class="text-xl font-semibold text-ibm-navy">Report: ${escapeHtml(run.model)} <span class="text-sm font-normal text-gray-700">run ${escapeHtml(run.id)}${run.finished ? "" : " (incomplete)"}</span></h3>
+    return `<div class="card p-4">${licState.licensed ? "" : '<p class="bad font-semibold">TRIAL MODE — unlicensed copy. <a class="underline" href="buy.html">Get a license</a> for clean exports.</p>'}<h3 class="text-xl font-semibold text-ibm-navy">Report: ${escapeHtml(run.model)} <span class="text-sm font-normal text-gray-700">run ${escapeHtml(run.id)}${run.finished ? "" : " (incomplete)"}</span></h3>
       <p class="text-sm text-gray-700">Started ${escapeHtml(run.started_at)} · max tokens ${run.settings.num_predict} · temperature ${run.settings.temperature} · thinking ${escapeHtml(run.settings.think || "default")} · repeats ${run.settings.repeats} · styles: ${run.variants.join(", ")}</p>
       <div class="grid sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4 text-center">
         ${[["Accuracy", pct(s.acc)], ["95% interval", `${pct(s.lo)}–${pct(s.hi)}`], ["Hallucination", na(s.hallucination)], ["Over-refusal", na(s.overRefusal)], ["Premise accepted", na(s.premise)], ["Median latency", s.medianLatency == null ? "n/a" : s.medianLatency.toFixed(1) + " s"]].map(([l, v]) => `<div class="border border-ibm-line p-2"><div class="text-xl font-semibold text-ibm-navy">${v}</div><div class="text-xs">${l}</div></div>`).join("")}

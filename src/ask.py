@@ -17,6 +17,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+from grocery_eval import license as lic  # noqa: E402
 from grocery_eval.ollama_client import OllamaClient, OllamaError  # noqa: E402
 from grocery_eval.scoring import score_response  # noqa: E402
 from run_eval import build_messages, load_data  # noqa: E402
@@ -45,6 +46,16 @@ def main() -> int:
     q = next((x for x in data["questions"] if x["id"].lower() == args.question.lower()
               or x["question"].strip().lower() == args.question.strip().lower()), None)
     question_text = q["question"] if q else args.question
+    st = lic.status()
+    if not st["licensed"]:
+        print("TRIAL MODE:", st["reason"])
+        if (q and q["id"] not in lic.TRIAL_QUESTIONS) or args.variant not in lic.TRIAL_VARIANTS:
+            print(f"Trial limits: questions {', '.join(lic.TRIAL_QUESTIONS)} and the {', '.join(lic.TRIAL_VARIANTS)} style. "
+                  "Free-text questions are allowed. Activate with: python activate.py <KEY>")
+            if q and q["id"] not in lic.TRIAL_QUESTIONS:
+                return 1
+            if args.variant not in lic.TRIAL_VARIANTS:
+                return 1
     messages = build_messages(variants[args.variant], data["prompts"], data["document"], question_text)
 
     print(f"Model: {args.model}   Variant: {args.variant}   Temperature: {args.temperature}")

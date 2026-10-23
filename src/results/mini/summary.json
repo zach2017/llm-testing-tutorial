@@ -1,0 +1,197 @@
+{
+  "models": [
+    "deepseek-r1:1.5b"
+  ],
+  "variants": [
+    "baseline"
+  ],
+  "categories": [
+    "factual",
+    "false_premise",
+    "unanswerable"
+  ],
+  "n_rows": 3,
+  "n_errors": 0,
+  "n_scored_rows": 3,
+  "baseline_variant": "baseline",
+  "control_variants": [
+    "no_context"
+  ],
+  "repeats": 1,
+  "temperatures": [
+    0.0
+  ],
+  "headline": {
+    "deepseek-r1:1.5b": {
+      "n": 3,
+      "correct": 2,
+      "accuracy": 0.6666666666666666,
+      "ci_low": 0.2076549551264879,
+      "ci_high": 0.9385096847238394,
+      "mean_score": 0.6666666666666666,
+      "hallucination_rate": 0.0,
+      "over_refusal_rate": 0.0,
+      "premise_acceptance_rate": 1.0,
+      "format_compliance": null,
+      "median_latency_s": 4.254955792013789,
+      "mean_tokens_per_s": 73.08897109580998,
+      "mean_answer_words": 21.666666666666668,
+      "errors": 0,
+      "judge_accuracy": null,
+      "judge_n": 0,
+      "judge_agreement_with_heuristic": null,
+      "consistency": null,
+      "flip_rate": null,
+      "paraphrase_consistency": null,
+      "paraphrase_groups": 0
+    }
+  },
+  "by_category": {
+    "deepseek-r1:1.5b": {
+      "factual": {
+        "n": 1,
+        "correct": 1,
+        "accuracy": 1.0,
+        "ci_low": 0.20654329147389294,
+        "ci_high": 1.0,
+        "mean_score": 1.0
+      },
+      "false_premise": {
+        "n": 1,
+        "correct": 0,
+        "accuracy": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.7934567085261071,
+        "mean_score": 0.0
+      },
+      "unanswerable": {
+        "n": 1,
+        "correct": 1,
+        "accuracy": 1.0,
+        "ci_low": 0.20654329147389294,
+        "ci_high": 1.0,
+        "mean_score": 1.0
+      }
+    }
+  },
+  "by_position": {
+    "deepseek-r1:1.5b": {
+      "start": {
+        "n": 2,
+        "correct": 1,
+        "accuracy": 0.5,
+        "ci_low": 0.09452865480086614,
+        "ci_high": 0.9054713451991339,
+        "mean_score": 0.5
+      }
+    }
+  },
+  "by_difficulty": {
+    "deepseek-r1:1.5b": {
+      "1": {
+        "n": 1,
+        "correct": 1,
+        "accuracy": 1.0,
+        "ci_low": 0.20654329147389294,
+        "ci_high": 1.0,
+        "mean_score": 1.0
+      },
+      "2": {
+        "n": 1,
+        "correct": 1,
+        "accuracy": 1.0,
+        "ci_low": 0.20654329147389294,
+        "ci_high": 1.0,
+        "mean_score": 1.0
+      },
+      "3": {
+        "n": 1,
+        "correct": 0,
+        "accuracy": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.7934567085261071,
+        "mean_score": 0.0
+      }
+    }
+  },
+  "by_variant": {
+    "deepseek-r1:1.5b": {
+      "baseline": {
+        "n": 3,
+        "correct": 2,
+        "accuracy": 0.6666666666666666,
+        "ci_low": 0.2076549551264879,
+        "ci_high": 0.9385096847238394,
+        "mean_score": 0.6666666666666666,
+        "refusal_rate": 0.3333333333333333,
+        "mean_answer_words": 21.666666666666668,
+        "delta_vs_baseline": null
+      }
+    }
+  },
+  "control": {},
+  "failure_modes": {
+    "deepseek-r1:1.5b": {
+      "wrong_value": 0,
+      "wrong_entity": 0,
+      "partial": 0,
+      "no_answer": 0,
+      "hallucination": 0,
+      "over_refusal": 0,
+      "premise_accepted": 1,
+      "format_violation": 0,
+      "error": 0
+    }
+  },
+  "process": {
+    "deepseek-r1:1.5b": {
+      "answer_words_correct": 12.0,
+      "answer_words_incorrect": 41.0,
+      "thinking_rows": 3
+    }
+  },
+  "pairwise": [],
+  "per_question": {
+    "Q01": {
+      "category": "factual",
+      "question": "Who founded Maple Street Market?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q31": {
+      "category": "unanswerable",
+      "question": "What is the store's phone number?",
+      "overall": 1.0,
+      "deepseek-r1:1.5b": 1.0
+    },
+    "Q36": {
+      "category": "false_premise",
+      "question": "Why does the store close at noon on Sundays?",
+      "overall": 0.0,
+      "deepseek-r1:1.5b": 0.0
+    }
+  },
+  "meta": {
+    "title": "Grocery-Store Reading Comprehension Benchmark",
+    "generated_at": "2026-10-23T16:02:25",
+    "document": "grocery_store.txt",
+    "document_sha256": "0d304fededf1132c5d9cf1cdb1b225b8641ed36d303c120a28443bc81bd829cb",
+    "backend": "ollama",
+    "ollama_version": "0.34.0",
+    "run_id": "20261023-160211-d9d312",
+    "config": {
+      "models": [
+        "deepseek-r1:1.5b"
+      ],
+      "variants": [
+        "baseline"
+      ],
+      "repeats": 1,
+      "temperature": 0.0,
+      "seed": 42,
+      "num_predict": 1500,
+      "paraphrases": false,
+      "judge_model": null
+    }
+  }
+}

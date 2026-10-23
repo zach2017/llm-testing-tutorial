@@ -12,6 +12,15 @@ Built for [Ollama](https://ollama.com) models (e.g. `llama3.2:1b`, `gemma3:1b`, 
 the runner only uses Ollama's HTTP API, so any server that speaks it works. Pure Python 3.9+,
 no dependencies (matplotlib is optional, for charts).
 
+## Licensing (trial vs. licensed)
+
+Without a key the kit runs in **trial mode**: the 6 starter questions, the `baseline` style, and
+watermarked exports. A license key (`GLE1-...`) unlocks everything. Activate with
+`python activate.py <KEY>`, in the Live Lab page, or `go run ./server -activate <KEY>`. Keys are
+verified offline against the publisher's public key; nothing is sent anywhere. The `expires` date
+in a key ends updates/support, not the software. A demo key for trying the flow is in
+`docs/DEMO_LICENSE_KEY.txt`. Sellers: see `docs/GO_TO_MARKET.md` and `license/` (key issuing tool).
+
 ## Web pages and API server
 
 ```
@@ -73,6 +82,12 @@ or `--limit 10` for a quicker look, and `--resume` to continue an interrupted ru
 | `TUTORIAL.md` | Beginner's walk-through (text version). |
 | `web/` | Tutorial page, Live Lab page, shared JS (scorer port, data bundle). |
 | `server/` | Go API server (see `server/README.md`). |
+| `license/` | Go license tool: `keygen`, `issue`, `verify`, optional `serve` activation ledger. |
+| `activate.py`, `grocery_eval/license.py`, `web/license.js` | License activation and offline verification. |
+| `web/buy.html`, `web/eula.html` | Sales page and license terms (placeholders to fill in). |
+| `docs/AI_TESTING_CHECKLIST.md` | Pre-deployment testing checklist for chatbots, RAG apps and agents. |
+| `docs/GO_TO_MARKET.md` | How to sell it: storefront, keys, release build, support, Zoom. |
+| `make_release.py` | Builds the customer zip (excludes private keys, ledger, sales page). |
 | `grocery_eval/scoring.py` | Heuristic scorer and failure-mode taxonomy. |
 | `grocery_eval/stats.py` | Wilson intervals, paired bootstrap, exact sign test. |
 | `grocery_eval/report.py` | Aggregation and Markdown / CSV / JSON / chart writers. |

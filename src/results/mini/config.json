@@ -1,0 +1,40 @@
+{
+  "models": [
+    "deepseek-r1:1.5b"
+  ],
+  "variants": [
+    "baseline"
+  ],
+  "questions": [
+    "Q01",
+    "Q31",
+    "Q36"
+  ],
+  "categories": null,
+  "limit": null,
+  "paraphrases": false,
+  "repeats": 1,
+  "temperature": 0.0,
+  "seed": 42,
+  "num_predict": 1500,
+  "num_ctx": null,
+  "think": null,
+  "host": "http://localhost:11434",
+  "timeout": 180.0,
+  "backend": "ollama",
+  "judge_model": null,
+  "data": "/Users/zach/llm-testing-tutorial/src/data",
+  "out": "results/mini",
+  "resume": false,
+  "no_report": false,
+  "no_charts": true,
+  "examples": 5,
+  "list_models": false,
+  "self_test": false,
+  "dry_run": false,
+  "run_id": "20261023-160211-d9d312",
+  "n_question_instances": 3,
+  "document_sha256": "0d304fededf1132c5d9cf1cdb1b225b8641ed36d303c120a28443bc81bd829cb",
+  "ollama_version": "0.34.0",
+  "started_at": "2026-10-23T16:02:11"
+}
